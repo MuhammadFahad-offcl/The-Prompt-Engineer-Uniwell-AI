@@ -8,6 +8,7 @@ import uuid
 from datetime import datetime, timezone
 
 os.environ.setdefault("APP_ENV", "test")
+os.environ["AI_PROVIDER"] = "gemini"  # tests are independent of the developer's .env
 os.environ["GEMINI_API_KEY"] = ""  # never hit a real provider from tests
 os.environ["GROQ_API_KEY"] = ""
 
