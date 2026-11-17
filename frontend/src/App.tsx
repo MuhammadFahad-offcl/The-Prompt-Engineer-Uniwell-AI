@@ -64,8 +64,6 @@ export default function App() {
   }, [setProfile])
 
   const boot = useCallback(async () => {
-    setBooting(true)
-    setBootError(null)
     try {
       await Promise.all([refreshProfile(), refreshHealth()])
     } catch (err) {
@@ -78,6 +76,12 @@ export default function App() {
   useEffect(() => {
     void boot()
   }, [boot])
+
+  const retryBoot = () => {
+    setBooting(true)
+    setBootError(null)
+    void boot()
+  }
 
   // Route guard: without a profile only the public screens are reachable.
   useEffect(() => {
@@ -113,7 +117,7 @@ export default function App() {
   } else if (bootError) {
     content = (
       <div className="mx-auto max-w-xl p-6">
-        <ErrorBanner title="UniWell can’t start" message={bootError} onRetry={() => void boot()} />
+        <ErrorBanner title="UniWell can’t start" message={bootError} onRetry={retryBoot} />
       </div>
     )
   } else if (!profile) {
