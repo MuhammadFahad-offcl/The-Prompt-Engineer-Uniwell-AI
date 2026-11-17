@@ -45,7 +45,48 @@ General AI can generate a study plan. UniWell links a student's real workload, d
 | Frontend | React 19, Vite, TypeScript, Tailwind CSS v4, Recharts, lucide icons |
 | Backend | Python 3.12+ (tested on 3.14), FastAPI, Pydantic v2, SQLAlchemy 2, SQLite |
 | AI | Gemini REST API (default) or Groq's OpenAI-compatible API, behind an `AIProvider` abstraction. Called with `httpx`, no SDK. |
-| Tests | Pytest (68 tests), TypeScript build, oxlint |
+| Tests | Pytest (83 tests), TypeScript build, oxlint |
+
+## MindBalance Engine
+
+A wellbeing-first module in the main navigation (**MindBalance**), with six tabs: Home, Check-in, Recovery, Journal, Insights and Adaptive plan. It runs entirely on deterministic Python rules, so it needs **no LLM and has no API cost**.
+
+```
+Check-in → state analysis → recovery suggestion → activity → "How are you feeling now?"
+        → (student-confirmed) schedule adjustments → live AI plan → pattern insights
+```
+
+- **Check-in:** mood (5 levels), stress 1–10, energy 1–10, mental condition, academic pressure, and an optional private note. Transparent rules map these to *Balanced*, *Elevated stress*, *Low energy*, *Overloaded* or *Recovery recommended*. The rules are shown in the UI. This is never a diagnosis.
+- **Recovery activities:**
+  - guided breathing (2 or 5 min, animated 4-2-6 cycle)
+  - interactive 5-4-3-2-1 grounding (nothing is saved)
+  - thought-unloading journal
+  - energy recovery (walk, stretch, water, screen break, rest, mindful minute)
+  - motivation reset (task micro-steps)
+
+  Each activity takes optional before and after stress/energy ratings plus "was this helpful?". Students can stop at any time. Activities the student rated helpful twice are suggested first; this is a fixed rule, not machine learning.
+- **Insights:** 14-day stress and energy trends, a stress-vs-energy chart, check-in consistency, recovery usage and helpfulness, and the average change after recovery. Observations appear only above sample-size thresholds, are worded as patterns rather than causes, and show an empty state when there isn't enough data.
+- **Adaptive plan:** based on the check-in and real tasks, MindBalance proposes:
+  - a recovery activity first
+  - shorter blocks
+  - fewer tasks
+  - splitting the most urgent task (same total minutes, same deadline)
+  - deferring non-urgent tasks from *today's* plan
+
+  **Nothing is applied until the student ticks and confirms it.** Deadlines never move and tasks are never deleted. Confirmed choices change the next live AI plan, which receives the state and ratings only, never journal text.
+- **Privacy:** journal entries and check-in notes are **encrypted at rest** with Fernet. The key comes from `MINDBALANCE_KEY`, or else a generated, git-ignored `backend/.journal.key`. They are returned only to their owner and never sent to an AI provider. All MindBalance routes use the same per-user ownership guard and are included in "Delete my data".
+- **Safety:** explicit statements of immediate danger in a note or journal entry show a safety pathway instead of recommendations, and state that UniWell is not an emergency service. Support contacts appear only from `backend/app/data/support_contacts.json` entries that have a `verified_source` and a `verified_on` date. The file is empty by default, so no numbers are invented.
+
+**Endpoints:**
+- `GET /api/mindbalance/{user_id}/summary`
+- `POST /api/mindbalance/checkins`, `GET /api/mindbalance/checkins/{user_id}`
+- `POST /api/mindbalance/sessions`, `POST /api/mindbalance/sessions/{id}/finish`, `GET /api/mindbalance/sessions/{user_id}`
+- `POST /api/mindbalance/journal`, `GET /api/mindbalance/journal/{user_id}`, `DELETE /api/mindbalance/journal/{id}`
+- `GET /api/mindbalance/insights/{user_id}`
+- `GET /api/mindbalance/micro-steps/{task_id}`
+- `POST /api/mindbalance/adjustments/propose`, `POST /api/mindbalance/adjustments/{id}/decide`
+
+**New tables:** `wellbeing_checkins`, `recovery_sessions`, `journal_entries` and `plan_adjustments`. They are created automatically by `create_all` on startup; existing tables are unchanged.
 
 ## Design system
 
@@ -83,7 +124,7 @@ backend/app/
   schemas/      Pydantic request/response + AI output contract
   db/           SQLAlchemy models + session
   data/resources.json
-backend/tests/  68 pytest tests (mock AI provider in tests only)
+backend/tests/  83 pytest tests (mock AI provider in tests only)
 frontend/src/
   features/     onboarding, checkin, tasks, pressure-radar, plans, feedback, insights, resources, settings, dashboard
   components/   Layout, UI primitives, ErrorBoundary
@@ -138,7 +179,7 @@ npm run dev                        # http://localhost:5173 (proxies /api to :800
 ### 4. Tests and checks
 
 ```bash
-cd backend && .venv\Scripts\python -m pytest -q      # 68 tests
+cd backend && .venv\Scripts\python -m pytest -q      # 83 tests
 cd frontend && npm run build && npm run lint
 ```
 
@@ -212,6 +253,7 @@ Every error has the shape `{"error": {"code", "message"}}`. AI codes are `ai_not
 
 ## Known limitations
 
+- **MindBalance encryption key.** If `MINDBALANCE_KEY` changes or `backend/.journal.key` is lost, old journal entries can't be decrypted; they show as "could not decrypt" rather than garbage. On serverless hosting (e.g. Vercel), set `MINDBALANCE_KEY` explicitly. Note that SQLite there does not persist between requests.
 - **Not production auth.** The anonymous ID header is a hackathon ownership guard, not authentication. A real deployment needs authentication, encryption at rest, a retention policy, a security review and a legal/privacy review.
 - **SQLite and no migrations.** If the schema changes between versions, delete `backend/uniwell.db`; it contains only local and demo data.
 - **Roman Urdu UI is partial.** AI output fully follows the chosen language. Untranslated UI strings fall back to English.
