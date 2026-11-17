@@ -100,7 +100,7 @@ Then edit `.env` at the repo root:
 | `AI_PROVIDER` | no | `gemini` (default) or `groq` |
 | `GEMINI_API_KEY` | **yes, for live plans** | Free key from https://aistudio.google.com/apikey |
 | `GEMINI_MODEL` | no | Defaults to `gemini-2.5-flash`. Set any model your key can use. |
-| `GROQ_API_KEY` / `GROQ_MODEL` | only if `AI_PROVIDER=groq` | Key from https://console.groq.com/keys. Default model is `llama-3.3-70b-versatile`. |
+| `GROQ_API_KEY` / `GROQ_MODEL` | only if `AI_PROVIDER=groq` | Key from https://console.groq.com/keys. Default model is `openai/gpt-oss-120b`. |
 | `DATABASE_URL` | no | Defaults to `backend/uniwell.db` |
 | `FRONTEND_ORIGIN` | no | CORS allowlist, default `http://localhost:5173` |
 | `APP_ENV` | no | `development` enables `/api/demo/seed`; `production` disables it |

@@ -133,11 +133,14 @@ class GroqProvider:
         payload = {
             "model": self.model,
             "temperature": 0.6,
-            "max_tokens": 3000,
+            "max_tokens": 8000,
             "response_format": {"type": "json_object"},
             "messages": [{"role": "system", "content": system}]
             + [{"role": m.role, "content": m.content} for m in messages],
         }
+        if "gpt-oss" in self.model:
+            # Reasoning models share the token budget with their hidden reasoning; keep it short.
+            payload["reasoning_effort"] = "low"
         start = time.perf_counter()
         try:
             resp = httpx.post(
