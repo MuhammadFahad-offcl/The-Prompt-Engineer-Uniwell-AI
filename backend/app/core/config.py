@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     groq_api_key: str = ""
     groq_model: str = ""
     ai_timeout_seconds: float = 45.0
+    mindbalance_key: str = ""
 
     database_url: str = f"sqlite:///{(BACKEND_DIR / 'uniwell.db').as_posix()}"
     frontend_origin: str = "http://localhost:5173"

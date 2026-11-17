@@ -35,3 +35,6 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# MindBalance journal encryption key (generated locally)
+backend/.journal.key

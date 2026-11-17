@@ -55,7 +55,7 @@ PLANNING RULES (hard constraints: the server rejects plans that break them)
 - Prefer candidate tasks in rank order (rank 1 = most urgent). Explain each choice in the item's reason.
 - Every candidate task you do not schedule must appear in deferred_tasks with a short, kind reason and, where sensible, a suggested_review_date (YYYY-MM-DD, today or later).
 - If candidate_tasks is empty, do not invent coursework: create a light setup plan (for example, list upcoming deadlines or organise notes) with task_id null, and add a missing_info entry suggesting the student add their tasks.
-- If energy is low (<= 2) keep the plan gentler. If recent_feedback or adaptation_notes say earlier plans felt too long or too heavy, respect that and mention it in why_this_plan.
+- If wellbeing_today shows high stress or low energy, keep the plan gentler and kinder; never push the student to work longer. If energy is low (<= 2) keep the plan gentler. If recent_feedback or adaptation_notes say earlier plans felt too long or too heavy, respect that and mention it in why_this_plan.
 - Instructions must be concrete first steps (for example "Write the three headings for question 1"), not generic advice.
 
 LANGUAGE
@@ -333,9 +333,25 @@ def generate_plan(db: Session, user: User, note: str | None) -> GenerationResult
         buffer_minutes=user.buffer_minutes,
         keep_breaks=user.keep_breaks,
     )
+    overrides = _mindbalance_overrides(db, user)
+    if overrides["session_cap"]:
+        constraints.session_minutes = min(constraints.session_minutes, overrides["session_cap"])
+    if overrides["max_tasks"]:
+        constraints.max_study_tasks = min(constraints.max_study_tasks, overrides["max_tasks"])
+    constraints.notes.extend(overrides["notes"])
+
     ctx: StudentContext = build_context(
         db, user=user, checkin=checkin, radar=radar, constraints=constraints, now_utc=now, note=note
     )
+    # Tasks the student chose to move off today's plan (MindBalance) are not offered to the AI.
+    deferred_ids = set(overrides["deferred_task_ids"])
+    if deferred_ids:
+        ctx.student_deferred = [c for c in ctx.candidates if c.task.id in deferred_ids]
+        ctx.candidates = [c for c in ctx.candidates if c.task.id not in deferred_ids]
+        ctx.payload["candidate_tasks"] = [t for t in ctx.payload["candidate_tasks"] if t["task_id"] not in deferred_ids]
+    ctx.payload["wellbeing_today"] = overrides["wellbeing"]  # state + ratings only; never journal text
+    if overrides["recovery_first"]:
+        ctx.payload["student_choices"] = ["Start the plan with the wellbeing item (a short recovery activity) before any study block."]
 
     track(db, user.id, "plan_generation_started", provider=provider.name)
     db.commit()
@@ -392,6 +408,23 @@ def generate_plan(db: Session, user: User, note: str | None) -> GenerationResult
     return GenerationResult(kind="plan", plan=plan)
 
 
+def _mindbalance_overrides(db: Session, user: User) -> dict:
+    """Today's student-confirmed MindBalance adjustments + latest wellbeing state (no journal text)."""
+    from app.db.models import PlanAdjustment, WellbeingCheckIn
+    from app.services.mindbalance.academic_adaptation import plan_overrides
+
+    today = today_local(user.timezone)
+    adj = db.scalar(select(PlanAdjustment).where(PlanAdjustment.user_id == user.id, PlanAdjustment.local_date == today,
+                                                 PlanAdjustment.status == "applied")
+                    .order_by(PlanAdjustment.created_at.desc()).limit(1))
+    out = plan_overrides(adj.changes if adj else [])
+    wb = db.scalar(select(WellbeingCheckIn).where(WellbeingCheckIn.user_id == user.id, WellbeingCheckIn.local_date == today)
+                   .order_by(WellbeingCheckIn.created_at.desc()).limit(1))
+    out["wellbeing"] = ({"state": wb.state, "stress_1_to_10": wb.stress, "energy_1_to_10": wb.energy,
+                         "mood": wb.mood, "academic_pressure": wb.academic_pressure} if wb else None)
+    return out
+
+
 def _summarise_errors(exc: Exception) -> list[str]:
     if isinstance(exc, ValidationError):
         out = []
@@ -425,6 +458,11 @@ def _persist(db, user, checkin, ctx, constraints, radar, output, items, deferred
             "instructions": wb.instructions,
         },
         "deferred_tasks": deferred
+        + [
+            {"task_id": c.task.id, "title": c.task.title,
+             "reason": "You chose to move this off today's plan (MindBalance). Deadline unchanged.", "suggested_review_date": None}
+            for c in getattr(ctx, "student_deferred", [])
+        ]
         + [
             {"task_id": r.task.id, "title": r.task.title,
              "reason": "Due later — not part of today's planning window.", "suggested_review_date": None}

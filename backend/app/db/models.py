@@ -198,3 +198,80 @@ class ProductEvent(Base):
     event_name: Mapped[str] = mapped_column(String(48))
     metadata_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc)
+
+
+# ---------------------------------------------------------------- MindBalance Engine
+class WellbeingCheckIn(Base):
+    """MindBalance check-in (several per day allowed). Self-reported; never a diagnosis."""
+
+    __tablename__ = "wellbeing_checkins"
+    __table_args__ = (Index("ix_wb_user_created", "user_id", "created_at"),)
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    local_date: Mapped[date] = mapped_column(Date)
+    mood: Mapped[str] = mapped_column(String(12))  # very_good | good | neutral | low | very_low
+    stress: Mapped[int] = mapped_column(Integer)  # 1-10
+    energy: Mapped[int] = mapped_column(Integer)  # 1-10
+    mental_condition: Mapped[str] = mapped_column(String(24))
+    academic_pressure: Mapped[str] = mapped_column(String(12))  # low | moderate | high | very_high
+    note_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)  # optional, Fernet-encrypted
+    state: Mapped[str] = mapped_column(String(24))
+    state_reasons: Mapped[list] = mapped_column(JSON, default=list)
+    kind: Mapped[str] = mapped_column(String(12), default="daily")  # daily | post_activity
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc)
+
+
+class RecoverySession(Base):
+    __tablename__ = "recovery_sessions"
+    __table_args__ = (Index("ix_recovery_user_created", "user_id", "created_at"),)
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    checkin_id: Mapped[str | None] = mapped_column(ForeignKey("wellbeing_checkins.id", ondelete="SET NULL"), nullable=True)
+    activity: Mapped[str] = mapped_column(String(24))  # breathing | grounding | journal | energy | motivation
+    variant: Mapped[str | None] = mapped_column(String(40), nullable=True)  # e.g. "2min", "stretching"
+    status: Mapped[str] = mapped_column(String(12), default="started")  # started | completed | skipped
+    pre_stress: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    pre_energy: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    post_stress: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    post_energy: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    helpful: Mapped[str | None] = mapped_column(String(12), nullable=True)  # yes | somewhat | no
+    steps_completed: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class JournalEntry(Base):
+    """Thought-unloading journal. All text fields are Fernet-encrypted at rest and never sent to an LLM."""
+
+    __tablename__ = "journal_entries"
+    __table_args__ = (Index("ix_journal_user_created", "user_id", "created_at"),)
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    session_id: Mapped[str | None] = mapped_column(ForeignKey("recovery_sessions.id", ondelete="SET NULL"), nullable=True)
+    bothering_enc: Mapped[str] = mapped_column(Text)
+    in_control_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
+    outside_control_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
+    small_action_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc)
+
+
+class PlanAdjustment(Base):
+    """Proposed wellbeing-aware schedule changes. Nothing is applied until the student confirms."""
+
+    __tablename__ = "plan_adjustments"
+    __table_args__ = (Index("ix_adjust_user_date", "user_id", "local_date"),)
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    checkin_id: Mapped[str | None] = mapped_column(ForeignKey("wellbeing_checkins.id", ondelete="SET NULL"), nullable=True)
+    local_date: Mapped[date] = mapped_column(Date)
+    status: Mapped[str] = mapped_column(String(12), default="pending")  # pending | applied | dismissed
+    pressure_level: Mapped[str] = mapped_column(String(12))
+    summary: Mapped[str] = mapped_column(Text)
+    changes: Mapped[list] = mapped_column(JSON, default=list)  # [{id, type, task_id, title, detail, reason, accepted}]
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc)
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

@@ -11,6 +11,7 @@ from app.api.routes import (
     feedback,
     health,
     insights,
+    mindbalance,
     plans,
     profile,
     radar,
@@ -70,6 +71,7 @@ def create_app() -> FastAPI:
         plans,
         feedback,
         insights,
+        mindbalance,
         resources,
         demo,
     ):

@@ -4,7 +4,7 @@ Only the current user's data is read. No user ID, nickname, timezone name or oth
 identifier is sent to the model. Free text (task titles, subjects, the optional note) is
 sanitized and placed inside a JSON data object, never into the system prompt.
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
 from sqlalchemy import select
@@ -29,6 +29,7 @@ class StudentContext:
     not_considered: list[RankedTask]
     adaptation_explanations: list[str]
     previous_plan_at: datetime | None
+    student_deferred: list[RankedTask] = field(default_factory=list)
 
 
 def build_context(
