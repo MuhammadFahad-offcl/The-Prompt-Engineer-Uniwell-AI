@@ -181,6 +181,7 @@ class Resource(Base):
     summary: Mapped[str] = mapped_column(Text)
     rights_note: Mapped[str] = mapped_column(Text)
     verification_status: Mapped[str] = mapped_column(String(16), default="unverified")
+    source_updated: Mapped[str | None] = mapped_column(String(32), nullable=True)
     last_checked_at: Mapped[str | None] = mapped_column(String(32), nullable=True)
     reviewed: Mapped[bool] = mapped_column(Boolean, default=False)
 

@@ -333,6 +333,7 @@ export interface Resource {
   summary: string
   rights_note: string
   verification_status: 'verified' | 'unverified'
+  source_updated: string | null
   last_checked_at: string | null
   reviewed: boolean
 }

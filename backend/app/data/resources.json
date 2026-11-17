@@ -1,0 +1,58 @@
+[
+  {
+    "id": "who-doing-what-matters",
+    "title": "Doing What Matters in Times of Stress: An Illustrated Guide",
+    "publisher": "World Health Organization (WHO)",
+    "url": "https://www.who.int/publications-detail-redirect/9789240003927",
+    "topic": "Stress management skills",
+    "language": "English; the WHO page also lists Arabic, Bengali, Chinese, French, Hindi, Russian, Spanish and Urdu versions",
+    "summary": "A free illustrated self-help guide from WHO with short, practical skills for coping with stress. UniWell links to it instead of copying or adapting it.",
+    "rights_note": "WHO publication page states licence CC BY-NC-SA 3.0 IGO (non-commercial). Commercial use, adaptation or republication requires WHO permission. UniWell stores only this metadata and a link; it does not host, copy or adapt the guide, does not use WHO logos and does not imply endorsement.",
+    "verification_status": "verified",
+    "source_updated": null,
+    "last_checked_at": "2026-11-17",
+    "reviewed": false
+  },
+  {
+    "id": "nhs-breathing-exercises",
+    "title": "Breathing exercises for stress",
+    "publisher": "NHS (UK)",
+    "url": "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/",
+    "topic": "Breathing pause",
+    "language": "English",
+    "summary": "An NHS page describing a simple breathing exercise people can try when feeling stressed. If any exercise feels uncomfortable, stop.",
+    "rights_note": "External NHS page linked only. Content not copied or rehosted; review NHS website terms before any commercial reuse. No NHS logo used; no endorsement implied.",
+    "verification_status": "verified",
+    "source_updated": "2026-06-12",
+    "last_checked_at": "2026-11-17",
+    "reviewed": false
+  },
+  {
+    "id": "nhs-get-help-with-stress",
+    "title": "Get help with stress",
+    "publisher": "NHS (UK)",
+    "url": "https://www.nhs.uk/mental-health/feelings-symptoms-behaviours/feelings-and-symptoms/stress/",
+    "topic": "When and where to get support",
+    "language": "English",
+    "summary": "An NHS overview of everyday stress and when it may help to talk to someone. Its UK service details may not apply in Pakistan, so use local services.",
+    "rights_note": "External NHS page linked only. Content not copied or rehosted; review NHS website terms before any commercial reuse. UK-specific service details may not apply locally. No endorsement implied.",
+    "verification_status": "verified",
+    "source_updated": "2024-10-04",
+    "last_checked_at": "2026-11-17",
+    "reviewed": false
+  },
+  {
+    "id": "nhs-every-mind-matters-stress",
+    "title": "Stress — Every Mind Matters",
+    "publisher": "NHS Every Mind Matters (UK)",
+    "url": "https://www.nhs.uk/every-mind-matters/mental-health-issues/stress/",
+    "topic": "Everyday self-care ideas",
+    "language": "English",
+    "summary": "An NHS Every Mind Matters page with general self-care ideas for managing day-to-day stress.",
+    "rights_note": "External NHS page linked only. Content not copied or rehosted; review NHS website terms before any commercial reuse. No endorsement implied.",
+    "verification_status": "verified",
+    "source_updated": null,
+    "last_checked_at": "2026-11-17",
+    "reviewed": false
+  }
+]

@@ -1,22 +1,13 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.core.clock import get_zone
 from app.core.errors import ApiError
 from app.core.security import assert_same_user, caller_id, load_user
 from app.db.database import get_db
-from app.db.models import (
-    AdaptationEvent,
-    CheckIn,
-    Feedback,
-    Plan,
-    PlanItem,
-    ProductEvent,
-    Task,
-    User,
-)
+from app.db.models import AdaptationEvent, User
 from app.schemas.profile import ProfileOut, ProfileUpsert
+from app.services.data_service import delete_all_user_data
 from app.services.events_service import track
 
 router = APIRouter(tags=["profile"])
@@ -87,24 +78,6 @@ def reset_adaptation(user_id: str, caller: str = Depends(caller_id), db: Session
     db.commit()
     db.refresh(user)
     return user
-
-
-def delete_all_user_data(db: Session, user_id: str) -> dict:
-    """Remove every record tied to this anonymous ID. Returns per-table counts."""
-    plan_ids = select(Plan.id).where(Plan.user_id == user_id)
-    counts = {}
-    for name, stmt in (
-        ("plan_items", delete(PlanItem).where(PlanItem.plan_id.in_(plan_ids))),
-        ("adaptation_events", delete(AdaptationEvent).where(AdaptationEvent.user_id == user_id)),
-        ("feedback", delete(Feedback).where(Feedback.user_id == user_id)),
-        ("plans", delete(Plan).where(Plan.user_id == user_id)),
-        ("checkins", delete(CheckIn).where(CheckIn.user_id == user_id)),
-        ("tasks", delete(Task).where(Task.user_id == user_id)),
-        ("events", delete(ProductEvent).where(ProductEvent.user_id == user_id)),
-        ("users", delete(User).where(User.id == user_id)),
-    ):
-        counts[name] = db.execute(stmt.execution_options(synchronize_session=False)).rowcount or 0
-    return counts
 
 
 @router.delete("/user/{user_id}/data")
