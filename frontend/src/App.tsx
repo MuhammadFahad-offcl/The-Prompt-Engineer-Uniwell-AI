@@ -18,6 +18,7 @@ import { PlanPage } from './features/plans/PlanPage'
 import { InsightsPage } from './features/insights/InsightsPage'
 import { HistoryPage } from './features/insights/HistoryPage'
 import { ResourcesPage } from './features/resources/ResourcesPage'
+import { MindBalancePage } from './features/mindbalance/MindBalancePage'
 
 const PUBLIC_ROUTES = new Set(['', 'welcome', 'onboarding'])
 
@@ -135,6 +136,8 @@ export default function App() {
 
 function renderPage(name: string, param: string | null) {
   switch (name) {
+    case 'mindbalance':
+      return <MindBalancePage tab={param} />
     case 'checkin':
       return <CheckInPage />
     case 'tasks':

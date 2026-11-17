@@ -344,3 +344,105 @@ export interface DemoSeedResult {
   counts: Record<string, number>
   label: string
 }
+
+// ---------------------------------------------------------------- MindBalance
+export type MBMood = 'very_good' | 'good' | 'neutral' | 'low' | 'very_low'
+export type MBCondition = 'calm' | 'overwhelmed' | 'anxious' | 'mentally_exhausted' | 'demotivated' | 'unable_to_concentrate'
+export type MBPressure = 'low' | 'moderate' | 'high' | 'very_high'
+export type MBState = 'balanced' | 'elevated_stress' | 'low_energy' | 'overloaded' | 'recovery_recommended'
+export type MBActivity = 'breathing' | 'grounding' | 'journal' | 'energy' | 'motivation'
+
+export interface MBCheckIn {
+  id: string
+  local_date: string
+  mood: MBMood
+  stress: number
+  energy: number
+  mental_condition: MBCondition
+  academic_pressure: MBPressure
+  note: string | null
+  state: MBState
+  state_label: string
+  state_reasons: string[]
+  kind: 'daily' | 'post_activity'
+  is_synthetic: boolean
+  created_at: string
+}
+export interface MBRecommendation {
+  activity: MBActivity
+  label: string
+  reason: string
+  personal_note: string | null
+}
+export interface MBSafety {
+  title: string
+  message: string
+  actions: string[]
+  contacts: { name: string; phone?: string; url?: string; region?: string }[]
+  not_emergency_service: string
+}
+export interface MBChange {
+  id: string
+  type: 'recovery_first' | 'lighter_sessions' | 'focus' | 'split_task' | 'defer_task'
+  task_id: string | null
+  title: string
+  detail: string
+  reason: string
+  accepted: boolean | null
+}
+export interface MBAdjustment {
+  id: string
+  local_date: string
+  status: 'pending' | 'applied' | 'dismissed'
+  pressure_level: string
+  summary: string
+  changes: MBChange[]
+  created_at: string
+}
+export interface MBSummary {
+  latest_checkin: MBCheckIn | null
+  recommendations: MBRecommendation[]
+  rules: string[]
+  adjustment: MBAdjustment | null
+  support_contacts: MBSafety['contacts']
+}
+export interface MBSession {
+  id: string
+  activity: MBActivity
+  status: 'started' | 'completed' | 'skipped'
+  pre_stress: number | null
+  pre_energy: number | null
+  post_stress: number | null
+  post_energy: number | null
+  helpful: 'yes' | 'somewhat' | 'no' | null
+  created_at: string
+}
+export interface MBJournal {
+  id: string
+  bothering: string | null
+  in_control: string | null
+  outside_control: string | null
+  small_action: string | null
+  created_at: string
+}
+export interface MBInsightDay {
+  local_date: string
+  weekday: string
+  count: number
+  stress: number | null
+  energy: number | null
+  mood: number | null
+}
+export interface MBInsights {
+  window_days: number
+  days: MBInsightDay[]
+  days_with_checkins: number
+  consistency_pct: number
+  total_checkins: number
+  recovery_usage: Record<string, number>
+  recovery_helpfulness: Record<string, Record<string, number>>
+  average_change_after_recovery: { sessions: number; stress: number; energy: number } | null
+  observations: { text: string; sample_size: number; kind: string }[]
+  min_days_for_observations: number
+  scatter: { stress: number; energy: number; date: string }[]
+}

@@ -17,6 +17,14 @@ import type {
   Resource,
   Task,
   TaskInput,
+  MBAdjustment,
+  MBCheckIn,
+  MBInsights,
+  MBJournal,
+  MBRecommendation,
+  MBSafety,
+  MBSession,
+  MBSummary,
 } from '../types/api'
 import { getUserId } from './session'
 
@@ -96,6 +104,23 @@ export const api = {
 
   insights: (uid: string) => request<Insights>('GET', `/insights/${uid}`),
   resources: () => request<Resource[]>('GET', '/resources'),
+
+  mb: {
+    summary: (uid: string) => request<MBSummary>('GET', `/mindbalance/${uid}/summary`),
+    checkIn: (body: Record<string, unknown>) =>
+      request<{ checkin: MBCheckIn; recommendations: MBRecommendation[]; safety: MBSafety | null }>('POST', '/mindbalance/checkins', body),
+    listCheckIns: (uid: string, days = 30) => request<MBCheckIn[]>('GET', `/mindbalance/checkins/${uid}?days=${days}`),
+    startSession: (body: Record<string, unknown>) => request<MBSession>('POST', '/mindbalance/sessions', body),
+    finishSession: (id: string, body: Record<string, unknown>) => request<MBSession>('POST', `/mindbalance/sessions/${id}/finish`, body),
+    saveJournal: (body: Record<string, unknown>) => request<{ entry: MBJournal; safety: MBSafety | null }>('POST', '/mindbalance/journal', body),
+    listJournal: (uid: string) => request<MBJournal[]>('GET', `/mindbalance/journal/${uid}`),
+    deleteJournal: (id: string) => request<{ deleted: boolean }>('DELETE', `/mindbalance/journal/${id}`),
+    insights: (uid: string) => request<MBInsights>('GET', `/mindbalance/insights/${uid}`),
+    microSteps: (taskId: string) => request<{ task_id: string; title: string; steps: string[] }>('GET', `/mindbalance/micro-steps/${taskId}`),
+    propose: () => request<{ adjustment: MBAdjustment | null; summary: string; pressure_level: string }>('POST', '/mindbalance/adjustments/propose'),
+    decide: (id: string, accepted: string[]) =>
+      request<{ adjustment: MBAdjustment; applied: string[] }>('POST', `/mindbalance/adjustments/${id}/decide`, { accepted_change_ids: accepted }),
+  },
 
   seedDemo: (uid: string, scenario: 'overloaded' | 'manageable', timezone: string) =>
     request<DemoSeedResult>('POST', '/demo/seed', { user_id: uid, scenario, timezone }),

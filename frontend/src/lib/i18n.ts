@@ -13,6 +13,7 @@ const en = {
 
   'nav.today': 'Today',
   'nav.checkin': 'Check-in',
+  'nav.mindbalance': 'MindBalance',
   'nav.tasks': 'Tasks',
   'nav.plan': 'Plan',
   'nav.radar': 'Pressure Radar',
