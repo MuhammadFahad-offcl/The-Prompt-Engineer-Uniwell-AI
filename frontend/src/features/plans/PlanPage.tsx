@@ -63,6 +63,7 @@ export function PlanPage({ planId }: { planId: string | null }) {
         setSafety(res.safety)
       } else {
         setPlan(res.plan)
+        window.scrollTo({ top: 0, behavior: 'smooth' })
         setNote('')
         setShowNote(false)
         void refreshProfile()
@@ -177,7 +178,7 @@ export function PlanPage({ planId }: { planId: string | null }) {
       {plan ? (
         <>
           <PlanView plan={plan} onItemsChange={(items) => setPlan({ ...plan, items })} />
-          <FeedbackPanel plan={plan} onSaved={(fb) => setPlan({ ...plan, feedback: fb })} onGenerateNext={() => void generate()} generating={generating} />
+          <FeedbackPanel key={plan.id} plan={plan} onSaved={(fb) => setPlan({ ...plan, feedback: fb })} onGenerateNext={() => void generate()} generating={generating} />
         </>
       ) : (
         !generating &&
