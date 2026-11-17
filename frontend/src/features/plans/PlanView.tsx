@@ -65,7 +65,7 @@ export function PlanView({ plan, onItemsChange }: { plan: PlanDetail; onItemsCha
           <span className="text-xs text-muted">{formatDate(plan.local_date)} · {formatDateTime(plan.created_at)}</span>
         </div>
         {plan.is_synthetic && <p className="mt-2 text-xs text-warn-700">{t('plan.syntheticRecord')}</p>}
-        <h2 className="mt-3 text-xl font-bold tracking-tight">{c.title}</h2>
+        <h2 className="mt-3 text-2xl font-extrabold tracking-tight">{c.title}</h2>
         <p className="mt-1 text-ink/90">{c.supportive_message}</p>
         <p className="mt-2 text-sm text-muted">{c.workload_summary}</p>
 
@@ -78,7 +78,7 @@ export function PlanView({ plan, onItemsChange }: { plan: PlanDetail; onItemsCha
             <span>{t('plan.progress', { done, total: plan.items.length })}</span>
           </div>
           <div className="h-2 rounded-full bg-line/70" aria-hidden>
-            <div className="h-2 rounded-full bg-mint-500" style={{ width: `${Math.min(pct, 100)}%` }} />
+            <div className="h-2 rounded-full bg-gradient-to-r from-brand-500 via-violet-500 to-mint-500 transition-[width] duration-1000 ease-out" style={{ width: `${Math.min(pct, 100)}%` }} />
           </div>
         </div>
 
@@ -92,7 +92,7 @@ export function PlanView({ plan, onItemsChange }: { plan: PlanDetail; onItemsCha
 
       {/* Adaptation explanation — the visible proof of the feedback loop */}
       {c.adaptation_explanations.length > 0 && (
-        <section className="rounded-2xl border border-mint-500/30 bg-mint-50 p-4" aria-labelledby="adapted-title">
+        <section className="glow-pulse rounded-[20px] border border-mint-400/50 bg-gradient-to-br from-mint-50 to-surface p-4 lg:p-5" aria-labelledby="adapted-title">
           <h3 id="adapted-title" className="flex items-center gap-2 font-semibold text-mint-700">
             <RefreshCw className="h-4 w-4" aria-hidden /> {t('plan.adapted')}
           </h3>
@@ -116,7 +116,7 @@ export function PlanView({ plan, onItemsChange }: { plan: PlanDetail; onItemsCha
           {plan.items.map((item) => {
             const s = ITEM_STYLE[item.item_type]
             return (
-              <li key={item.id} className={`flex gap-3 rounded-xl border p-3 transition-colors ${item.completed ? 'border-mint-500/30 bg-mint-50/40' : 'border-line'}`}>
+              <li key={item.id} className={`flex gap-3 rounded-2xl border p-3.5 transition-all duration-300 ${item.completed ? 'border-mint-400/40 bg-mint-50/50' : 'border-line hover:border-line-strong hover:bg-surface-hover'}`}>
                 <button
                   type="button"
                   onClick={() => void toggle(item)}
@@ -125,7 +125,7 @@ export function PlanView({ plan, onItemsChange }: { plan: PlanDetail; onItemsCha
                   aria-label={`${item.completed ? 'Mark not done' : 'Mark done'}: ${item.title}`}
                   className="mt-0.5 shrink-0 rounded-full text-mint-500 disabled:opacity-50"
                 >
-                  {item.completed ? <CheckCircle2 className="h-6 w-6" aria-hidden /> : <Circle className="h-6 w-6 text-line" aria-hidden />}
+                  {item.completed ? <CheckCircle2 className="check-pop h-7 w-7" aria-hidden /> : <Circle className="h-7 w-7 text-line-strong" aria-hidden />}
                 </button>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
@@ -204,9 +204,10 @@ export function PlanView({ plan, onItemsChange }: { plan: PlanDetail; onItemsCha
         </section>
       )}
 
-      <blockquote className="flex items-start gap-3 rounded-2xl bg-brand-900 p-5 text-white">
-        <HeartHandshake className="mt-0.5 h-5 w-5 shrink-0 text-mint-100" aria-hidden />
-        <p className="text-base font-medium">{c.affirmation}</p>
+      <blockquote className="relative isolate flex items-start gap-3 overflow-hidden rounded-[24px] bg-brand-900 p-6 text-surface shadow-[var(--shadow-glow)]">
+        <div className="aurora opacity-70" aria-hidden><div className="aurora-blob c" /></div>
+        <HeartHandshake className="relative mt-0.5 h-5 w-5 shrink-0 text-mint-400" aria-hidden />
+        <p className="relative font-display text-lg font-bold">{c.affirmation}</p>
       </blockquote>
 
       {(c.repairs.length > 0 || c.missing_info.length > 0) && (

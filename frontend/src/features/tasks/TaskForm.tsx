@@ -126,7 +126,7 @@ export function TaskForm({ task, onDone, onCancel }: { task: Task | null; onDone
       {error && <ErrorBanner message={error} />}
       <div className="flex gap-2">
         <button type="submit" className="btn-primary" disabled={saving}>
-          {saving ? <Spinner className="text-white" label={t('common.loading')} /> : t('common.save')}
+          {saving ? <Spinner className="text-surface" label={t('common.loading')} /> : t('common.save')}
         </button>
         <button type="button" className="btn-secondary" onClick={onCancel}>
           {t('common.cancel')}

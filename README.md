@@ -47,7 +47,15 @@ General AI can generate a study plan. UniWell links a student's real workload, d
 | AI | Gemini REST API (default) or Groq's OpenAI-compatible API, behind an `AIProvider` abstraction. Called with `httpx`, no SDK. |
 | Tests | Pytest (68 tests), TypeScript build, oxlint |
 
-## Architecture
+## Design system
+
+The UI follows **[`DESIGN.md`](DESIGN.md)**, the "Dusk Aurora" design system written with the `web-design` skill from the PRD:
+
+- **Theme:** indigo identity with aurora light (violet and mint), Plus Jakarta Sans for headings and Inter for body text, 20px cards and soft tinted shadows. Every color is a token in `frontend/src/index.css`; components contain no hex values, and charts read the tokens at runtime.
+- **Landing page (L2 showpiece):** an aurora hero with a cursor spotlight, a word-by-word headline with a flowing gradient phrase, and a tilted "Example" preview stack; a marquee of the core loop; a bento feature grid with spotlight cards and an animated adaptation counter.
+- **App screens (L2-lite):** data is always visible immediately. Screens get mount entrances, an animated Pressure Radar gauge and count-ups, check-pops on plan items and a glow on new adaptations.
+- **Implementation and fallbacks:** no animation libraries — CSS, IntersectionObserver and rAF only (`src/lib/motion.ts`). Every effect has a `prefers-reduced-motion` fallback, and cursor effects run only on hover-capable devices.
+
 
 ```
 React SPA (hash router, i18n dictionary, typed API client)

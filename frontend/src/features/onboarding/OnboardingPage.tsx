@@ -10,13 +10,17 @@ export function OnboardingPage() {
   const { setProfile, health } = useApp()
 
   return (
-    <div className="min-h-dvh bg-canvas">
-      <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
+    <div className="relative isolate min-h-dvh overflow-hidden bg-canvas">
+      <div className="aurora opacity-60" aria-hidden>
+        <div className="aurora-blob a" />
+        <div className="aurora-blob b" />
+      </div>
+      <div className="enter relative z-10 mx-auto max-w-2xl px-4 py-6 sm:px-6">
         <button type="button" onClick={() => navigate('welcome')} aria-label="Back to welcome">
           <Logo />
         </button>
-        <div className="card mt-6 sm:p-7">
-          <h1 className="text-2xl font-bold tracking-tight">{t('onb.title')}</h1>
+        <div className="card mt-6 shadow-[var(--shadow-lg)] sm:p-8">
+          <h1 className="text-[1.75rem] tracking-tight">{t('onb.title')}</h1>
           <p className="mt-1 mb-6 text-sm text-muted">{t('onb.subtitle')}</p>
           <ProfileForm
             initial={null}

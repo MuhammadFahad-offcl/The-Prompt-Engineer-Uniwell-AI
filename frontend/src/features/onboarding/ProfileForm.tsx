@@ -137,7 +137,7 @@ export function ProfileForm({
       {error && <ErrorBanner message={error} />}
       <div className="flex items-center gap-3">
         <button type="submit" className="btn-primary" disabled={saving}>
-          {saving ? <Spinner label={t('common.loading')} className="text-white" /> : submitLabel}
+          {saving ? <Spinner label={t('common.loading')} className="text-surface" /> : submitLabel}
         </button>
       </div>
       {!showConsent && <InfoNote>{t('onb.privacy1')}</InfoNote>}

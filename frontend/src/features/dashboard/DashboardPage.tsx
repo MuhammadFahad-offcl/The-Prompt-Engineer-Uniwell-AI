@@ -6,6 +6,7 @@ import { useT } from '../../lib/i18n'
 import { navigate } from '../../lib/router'
 import { formatDeadline, formatMinutes } from '../../lib/format'
 import { SERIES_COLOR } from '../../lib/theme'
+import { useMagnet } from '../../lib/motion'
 import type { CheckIn, Insights, PlanSummary, Radar } from '../../types/api'
 import { ErrorBanner, PageLoader, Stat, StatusPill, SyntheticBadge } from '../../components/ui'
 import { RadarCard } from '../pressure-radar/RadarCard'
@@ -23,6 +24,7 @@ export function DashboardPage() {
   const { userId, profile, health, dataVersion } = useApp()
   const [data, setData] = useState<DashData | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const ctaRef = useMagnet<HTMLButtonElement>(5)
 
   async function load() {
     if (!userId) return
@@ -54,9 +56,10 @@ export function DashboardPage() {
   const dueSoon = radar.ranked_tasks.filter((r) => r.bucket !== 'later').slice(0, 4)
 
   return (
-    <div className="space-y-4">
+    <div className="enter-stagger space-y-4 lg:space-y-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">{greeting}</h1>
+        <p className="eyebrow">{new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+        <h1 className="mt-1 text-[1.75rem] tracking-tight lg:text-[2rem]">{greeting}</h1>
         <p className="text-sm text-muted">{t('dash.sub')}</p>
       </div>
 
@@ -69,7 +72,7 @@ export function DashboardPage() {
             </h2>
             <div className="flex items-center gap-2">
               {checkin.is_synthetic && <SyntheticBadge />}
-              <button type="button" className="btn-ghost px-2 py-1" onClick={() => navigate('checkin')}>
+              <button type="button" className="btn-ghost whitespace-nowrap px-2 py-1" onClick={() => navigate('checkin')}>
                 {t('dash.editCheckin')}
               </button>
             </div>
@@ -118,8 +121,8 @@ export function DashboardPage() {
           ) : (
             <ul className="mt-3 space-y-2">
               {dueSoon.map((r) => (
-                <li key={r.task_id} className="flex items-center gap-3 rounded-xl border border-line px-3 py-2.5">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-bold text-brand-700">{r.rank}</span>
+                <li key={r.task_id} className="flex items-center gap-3 rounded-2xl border border-line px-3 py-2.5 transition-colors hover:border-line-strong hover:bg-surface-hover">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-violet-500 font-display text-xs font-bold text-surface">{r.rank}</span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">{r.title}</p>
                     <p className={`text-xs ${r.bucket === 'overdue' ? 'font-semibold text-over-700' : 'text-muted'}`}>
@@ -135,20 +138,25 @@ export function DashboardPage() {
       </div>
 
       {/* 4. Generate CTA */}
-      <section className="flex flex-col gap-3 rounded-2xl bg-brand-900 p-5 text-white sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="flex items-center gap-2 text-lg font-semibold">
-            <Sparkles className="h-5 w-5 text-mint-100" aria-hidden /> {t('dash.generate')}
+      <section className="relative isolate flex flex-col gap-4 overflow-hidden rounded-[24px] bg-brand-900 p-6 text-surface shadow-[var(--shadow-glow)] sm:flex-row sm:items-center sm:justify-between">
+        <div className="aurora opacity-80" aria-hidden>
+          <div className="aurora-blob b" />
+          <div className="aurora-blob c" />
+        </div>
+        <div className="relative">
+          <h2 className="flex items-center gap-2 text-xl font-extrabold">
+            <Sparkles className="h-5 w-5 text-mint-400" aria-hidden /> {t('dash.generate')}
           </h2>
-          <p className="text-sm text-white/75">
+          <p className="mt-1 text-sm text-surface/75">
             Live AI · {profile?.effective_session_minutes} min study blocks
             {profile?.adapted_session_minutes ? ' (adapted from your feedback)' : ''}
             {health && !health.ai.configured ? ' · AI provider not configured' : ''}
           </p>
         </div>
         <button
+          ref={ctaRef}
           type="button"
-          className="btn bg-white px-5 py-3 text-brand-900 hover:bg-mint-50"
+          className="btn relative bg-surface px-5 py-3 text-brand-900 shadow-[var(--shadow-md)] hover:bg-mint-50"
           onClick={() => navigate(checkin ? 'plan' : 'checkin')}
         >
           {checkin ? t('dash.generate') : t('dash.checkinCta')} <ArrowRight className="h-4 w-4" aria-hidden />

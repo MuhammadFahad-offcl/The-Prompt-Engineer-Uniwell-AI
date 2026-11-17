@@ -123,7 +123,8 @@ export function PlanPage({ planId }: { planId: string | null }) {
         </div>
       )}
       {generating && (
-        <div role="status" aria-live="polite" className="flex items-start gap-3 rounded-xl bg-brand-50 p-4">
+        <div role="status" aria-live="polite" className="relative isolate flex items-start gap-3 overflow-hidden rounded-2xl border border-brand-200 bg-brand-50 p-4">
+          <div className="skeleton absolute inset-0 -z-10 opacity-60" aria-hidden />
           <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-brand-600" aria-hidden />
           <div>
             <p className="font-semibold text-brand-900">{t('plan.generating')}</p>

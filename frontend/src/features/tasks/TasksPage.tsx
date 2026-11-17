@@ -160,7 +160,7 @@ export function TasksPage() {
                   aria-selected={filter === f}
                   onClick={() => setFilter(f)}
                   className={`shrink-0 rounded-lg px-3 py-1.5 text-sm font-medium ${
-                    filter === f ? 'bg-brand-600 text-white' : 'text-muted hover:bg-brand-50'
+                    filter === f ? 'bg-brand-600 text-surface' : 'text-muted hover:bg-brand-50'
                   }`}
                 >
                   {t(`tasks.filter.${f}`)} <span className="opacity-75">{counts[f]}</span>

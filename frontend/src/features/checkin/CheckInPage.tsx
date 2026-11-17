@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { Annoyed, ArrowRight, Frown, Laugh, Meh, Smile } from 'lucide-react'
 import { api, errorMessage } from '../../lib/api'
 import { useApp } from '../../lib/appState'
 import { useT, type TKey } from '../../lib/i18n'
@@ -9,7 +9,12 @@ import type { CheckIn, SleepQuality } from '../../types/api'
 import { ChoiceGroup, ErrorBanner, InfoNote, PageHeader, PageLoader, Spinner, SuccessBanner, SyntheticBadge } from '../../components/ui'
 
 const TIME_CHOICES = [30, 60, 90, 120, 180]
-const MOOD_EMOJI = ['😞', '😕', '😐', '🙂', '😄']
+const MOOD_ICONS = [Frown, Annoyed, Meh, Smile, Laugh]
+
+function moodIcon(v: number) {
+  const Icon = MOOD_ICONS[v - 1]
+  return <Icon className="h-5 w-5" aria-hidden />
+}
 
 export function CheckInPage() {
   const { t } = useT()
@@ -102,8 +107,9 @@ export function CheckInPage() {
   const scale = (prefix: 'mood' | 'workload' | 'energy') =>
     [1, 2, 3, 4, 5].map((v) => ({
       value: v,
-      label: prefix === 'mood' ? `${MOOD_EMOJI[v - 1]} ${v}` : String(v),
+      label: String(v),
       sub: t(`${prefix}.${v}` as TKey),
+      icon: prefix === 'mood' ? moodIcon(v) : undefined,
     }))
 
   return (
@@ -157,7 +163,7 @@ export function CheckInPage() {
                       setMinutes(m)
                     }}
                     className={`rounded-xl border px-2 py-2.5 text-sm font-semibold ${
-                      active ? 'border-brand-600 bg-brand-600 text-white' : 'border-line bg-surface hover:bg-brand-50'
+                      active ? 'border-brand-600 bg-brand-600 text-surface' : 'border-line bg-surface hover:bg-brand-50'
                     }`}
                   >
                     {m} {t('common.minutes')}
@@ -169,7 +175,7 @@ export function CheckInPage() {
                 aria-pressed={useCustom}
                 onClick={() => setUseCustom(true)}
                 className={`rounded-xl border px-2 py-2.5 text-sm font-semibold ${
-                  useCustom ? 'border-brand-600 bg-brand-600 text-white' : 'border-line bg-surface hover:bg-brand-50'
+                  useCustom ? 'border-brand-600 bg-brand-600 text-surface' : 'border-line bg-surface hover:bg-brand-50'
                 }`}
               >
                 {t('common.custom')}
@@ -207,7 +213,7 @@ export function CheckInPage() {
           </SuccessBanner>
         )}
         <button type="submit" className="btn-primary w-full py-3 sm:w-auto" disabled={saving}>
-          {saving ? <Spinner label={t('common.loading')} className="text-white" /> : existing ? t('ci.update') : t('ci.save')}
+          {saving ? <Spinner label={t('common.loading')} className="text-surface" /> : existing ? t('ci.update') : t('ci.save')}
         </button>
       </form>
     </div>

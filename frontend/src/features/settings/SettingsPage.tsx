@@ -169,7 +169,7 @@ export function SettingsPage() {
             disabled={confirmText !== 'DELETE' || deleting}
             onClick={() => void deleteAll()}
           >
-            {deleting ? <Spinner className="text-white" /> : t('set.delete')}
+            {deleting ? <Spinner className="text-surface" /> : t('set.delete')}
           </button>
         </div>
         {deleteError && (

@@ -135,7 +135,7 @@ export function FeedbackPanel({
               aria-pressed={reason === r}
               onClick={() => setReason(reason === r ? null : r)}
               className={`rounded-full border px-3 py-1.5 text-sm font-medium ${
-                reason === r ? 'border-brand-600 bg-brand-600 text-white' : 'border-line bg-surface hover:bg-brand-50'
+                reason === r ? 'border-brand-600 bg-brand-600 text-surface' : 'border-line bg-surface hover:bg-brand-50'
               }`}
             >
               {t(`reason.${r}`)}

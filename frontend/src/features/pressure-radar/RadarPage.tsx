@@ -75,7 +75,7 @@ export function RadarPage() {
           <ol className="mt-4 space-y-2">
             {radar.ranked_tasks.map((rt) => (
               <li key={rt.task_id} className="flex items-start gap-3 rounded-xl border border-line p-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-surface">
                   {rt.rank}
                 </span>
                 <div className="min-w-0 flex-1">
