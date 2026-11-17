@@ -4,8 +4,18 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 DEFAULT_TZ = "Asia/Karachi"
 
+_frozen_now: datetime | None = None
+
+
+def freeze_now(value: datetime | None) -> None:
+    """Test helper: pin 'now' to a fixed aware datetime (None to unfreeze)."""
+    global _frozen_now
+    _frozen_now = value
+
 
 def now_utc() -> datetime:
+    if _frozen_now is not None:
+        return _frozen_now.astimezone(timezone.utc)
     return datetime.now(timezone.utc)
 
 
