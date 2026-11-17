@@ -10,7 +10,7 @@ export function OnboardingPage() {
   const { setProfile, health } = useApp()
 
   return (
-    <div className="relative isolate min-h-dvh overflow-hidden bg-canvas">
+    <div className="relative isolate min-h-dvh overflow-hidden">
       <div className="aurora opacity-60" aria-hidden>
         <div className="aurora-blob a" />
         <div className="aurora-blob b" />

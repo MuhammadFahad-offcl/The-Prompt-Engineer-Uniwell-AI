@@ -1,16 +1,11 @@
 import { useEffect, useState } from 'react'
 import {
-  Annoyed,
   BarChart3,
   CalendarCheck,
-  Frown,
   HeartPulse,
-  Laugh,
   Leaf,
   Lock,
-  Meh,
   NotebookPen,
-  Smile,
   Sparkles,
   Trash2,
   Wind,
@@ -35,6 +30,7 @@ import type {
 } from '../../types/api'
 import { ChoiceGroup, EmptyState, ErrorBanner, InfoNote, PageHeader, PageLoader, Spinner, Stat, SuccessBanner } from '../../components/ui'
 import { ACTIVITY_META, JournalForm, RecoveryFlow } from './Recovery'
+import { MoodBlob, type BlobMood } from '../../components/MoodBlob'
 import { Panel, PRIVATE_NOTE, SafetyPanel, Scale10, StateBadge } from './shared'
 
 const TABS = [
@@ -241,12 +237,12 @@ function Recommendations({ recs, onStart }: { recs: MBRecommendation[]; onStart:
 
 /* --------------------------------------------------------------- check-in */
 
-const MOODS: { value: MBMood; label: string; Icon: typeof Smile }[] = [
-  { value: 'very_low', label: 'Very low', Icon: Frown },
-  { value: 'low', label: 'Low', Icon: Annoyed },
-  { value: 'neutral', label: 'Neutral', Icon: Meh },
-  { value: 'good', label: 'Good', Icon: Smile },
-  { value: 'very_good', label: 'Very good', Icon: Laugh },
+const MOODS: { value: MBMood; label: string; blob: BlobMood }[] = [
+  { value: 'very_low', label: 'Very low', blob: 'sad' },
+  { value: 'low', label: 'Low', blob: 'tired' },
+  { value: 'neutral', label: 'Neutral', blob: 'okay' },
+  { value: 'good', label: 'Good', blob: 'good' },
+  { value: 'very_good', label: 'Very good', blob: 'great' },
 ]
 const CONDITIONS: { value: MBCondition; label: string }[] = [
   { value: 'calm', label: 'Calm' },
@@ -328,7 +324,7 @@ function CheckInTab({ onSafety, onStart, go }: { onSafety: (s: MBSafety) => void
           label="How is your mood right now?"
           value={mood}
           onChange={setMood}
-          options={MOODS.map((m) => ({ value: m.value, label: m.label, icon: <m.Icon className="h-5 w-5" aria-hidden /> }))}
+          options={MOODS.map((m) => ({ value: m.value, label: m.label, icon: (active: boolean) => <MoodBlob mood={m.blob} selected={active} size={44} /> }))}
         />
         <Scale10 id="mb-stress" label="Stress level" value={stress} onChange={setStress} low="relaxed" high="extremely stressed" />
         <Scale10 id="mb-energy" label="Energy level" value={energy} onChange={setEnergy} low="drained" high="full of energy" />

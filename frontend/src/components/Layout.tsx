@@ -77,7 +77,7 @@ export function Layout({ current, children }: { current: string; children: React
 
       <div className="min-w-0 flex-1">
         {/* Mobile top bar — frosted once scrolled */}
-        <header className="topnav sticky top-0 z-20 flex items-center justify-between bg-canvas/80 px-4 py-3 lg:hidden" data-scrolled={scrolled}>
+        <header className="topnav sticky top-0 z-20 flex items-center justify-between bg-surface/50 px-4 py-3 backdrop-blur-md lg:hidden" data-scrolled={scrolled}>
           <button type="button" onClick={() => navigate('dashboard')} aria-label="UniWell home">
             <Logo />
           </button>

@@ -136,7 +136,7 @@ export function ChoiceGroup<T extends string | number>({
 }: {
   label: string
   hint?: string
-  options: { value: T; label: string; sub?: string; icon?: ReactNode }[]
+  options: { value: T; label: string; sub?: string; icon?: ReactNode | ((active: boolean) => ReactNode) }[]
   value: T | null
   onChange: (v: T) => void
   name: string
@@ -157,8 +157,10 @@ export function ChoiceGroup<T extends string | number>({
               key={String(o.value)}
               className={`relative flex min-h-12 cursor-pointer flex-col items-center justify-center rounded-2xl border px-1.5 py-2.5 text-center transition-all duration-200 has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-brand-200 ${
                 active
-                  ? 'border-transparent bg-gradient-to-br from-brand-600 to-brand-500 text-surface shadow-[var(--shadow-glow)]'
-                  : 'border-line bg-surface text-ink hover:-translate-y-0.5 hover:border-line-strong hover:bg-surface-hover'
+                  ? o.icon
+                    ? 'border-brand-300 bg-surface/90 text-brand-700 shadow-[var(--shadow-glow)] ring-2 ring-brand-200'
+                    : 'border-transparent bg-gradient-to-br from-brand-600 to-violet-500 text-surface shadow-[var(--shadow-glow)]'
+                  : 'border-surface/70 bg-surface/60 text-ink hover:-translate-y-0.5 hover:border-line-strong hover:bg-surface/85'
               }`}
             >
               <input
@@ -168,9 +170,11 @@ export function ChoiceGroup<T extends string | number>({
                 checked={active}
                 onChange={() => onChange(o.value)}
               />
-              {o.icon && <span className={`mb-1 ${active ? 'check-pop' : 'text-brand-600'}`}>{o.icon}</span>}
+              {o.icon && <span className="mb-1 text-brand-600">{typeof o.icon === 'function' ? o.icon(active) : o.icon}</span>}
               <span className="text-sm font-semibold leading-tight">{o.label}</span>
-              {o.sub && <span className={`mt-0.5 text-[11px] leading-tight ${active ? 'text-surface/85' : 'text-faint'}`}>{o.sub}</span>}
+              {o.sub && (
+                <span className={`mt-0.5 text-[11px] leading-tight ${active ? (o.icon ? 'text-brand-700/80' : 'text-surface/85') : 'text-faint'}`}>{o.sub}</span>
+              )}
             </label>
           )
         })}

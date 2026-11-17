@@ -10,7 +10,7 @@
   --font-sans: "Inter", "Segoe UI", ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
 
   /* Backgrounds */
-  --color-canvas: #f7f6fb;
+  --color-canvas: #f6f2ff;
   --color-surface: #ffffff;
   --color-surface-alt: #f1effa;
   --color-surface-hover: #f4f2fd;
@@ -55,6 +55,22 @@
 }
 
 :root {
+  /* Tokens used from inline SVG/CSS (declared here so Tailwind always emits them) */
+  /* Soft pastel atmosphere */
+  --color-lavender: #e9e1ff;
+  --color-blush: #ffe3ec;
+  --color-sky: #dde7ff;
+
+  /* Mood blob characters */
+  --color-blob-sad: #9cc3ff;
+  --color-blob-tired: #c9b8ff;
+  --color-blob-okay: #ffe08a;
+  --color-blob-good: #8fe3c8;
+  --color-blob-great: #ffa9c0;
+  --color-blob-cheek: #ff8fab;
+  --color-blob-spark: #ffb347;
+
+
   /* Template aliases (DESIGN.md §2) */
   --bg: var(--color-canvas);
   --surface: var(--color-surface);
@@ -78,9 +94,10 @@
   --violet-rgb: 139, 92, 246;
   --mint-rgb: 16, 185, 160;
   --white-rgb: 255, 255, 255;
+  --lilac-rgb: 150, 120, 220;
 
   /* Elevation (DESIGN.md §6) */
-  --shadow-sm: 0 1px 2px rgba(var(--ink-rgb), 0.04), 0 1px 3px rgba(var(--ink-rgb), 0.04);
+  --shadow-sm: 0 2px 6px rgba(var(--lilac-rgb), 0.08), 0 8px 24px -12px rgba(var(--lilac-rgb), 0.25);
   --shadow-md: 0 8px 24px -10px rgba(var(--ink-rgb), 0.14);
   --shadow-glow: 0 18px 50px -18px rgba(var(--accent-rgb), 0.45);
   --shadow-lg: 0 24px 60px -24px rgba(var(--ink-rgb), 0.3);
@@ -92,7 +109,14 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-canvas text-ink font-sans antialiased;
+    @apply text-ink font-sans antialiased;
+    background-color: var(--color-canvas);
+    background-image:
+      radial-gradient(1200px 700px at 0% 0%, var(--color-lavender), transparent 60%),
+      radial-gradient(900px 600px at 100% 30%, var(--color-blush), transparent 60%),
+      radial-gradient(1000px 700px at 30% 100%, var(--color-sky), transparent 60%),
+      linear-gradient(135deg, var(--color-lavender), var(--color-blush) 50%, var(--color-sky));
+    background-attachment: fixed;
     min-height: 100dvh;
     font-size: 0.9375rem;
     line-height: 1.6;
@@ -120,10 +144,12 @@
 
 @utility card {
   position: relative;
-  border-radius: 20px;
+  border-radius: 24px;
   padding: 1.25rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-line);
+  background: rgba(var(--white-rgb), 0.66);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(var(--white-rgb), 0.75);
   box-shadow: var(--shadow-sm);
   transition:
     border-color 0.2s,
@@ -175,12 +201,12 @@
 @utility btn-primary {
   @apply btn;
   color: var(--color-surface);
-  background: linear-gradient(135deg, var(--color-brand-600), var(--color-brand-500));
+  background: linear-gradient(135deg, var(--color-brand-600), var(--color-violet-500));
   box-shadow:
-    0 6px 18px -6px rgba(var(--accent-rgb), 0.55),
+    0 6px 18px -6px rgba(var(--accent-rgb), 0.5),
     inset 0 1px 0 rgba(var(--white-rgb), 0.18);
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--color-brand-700), var(--color-brand-600));
+    background: linear-gradient(135deg, var(--color-brand-700), var(--color-violet-500));
     box-shadow:
       0 10px 24px -8px rgba(var(--accent-rgb), 0.6),
       inset 0 1px 0 rgba(var(--white-rgb), 0.18);
@@ -188,8 +214,8 @@
 }
 @utility btn-secondary {
   @apply btn;
-  border: 1px solid var(--color-line);
-  background: var(--color-surface);
+  border: 1px solid rgba(var(--white-rgb), 0.8);
+  background: rgba(var(--white-rgb), 0.72);
   color: var(--color-ink);
   &:hover:not(:disabled) {
     border-color: var(--color-line-strong);
@@ -561,6 +587,59 @@
   background: linear-gradient(90deg, var(--color-brand-600), var(--color-violet-500), var(--color-mint-500));
 }
 
+/* Mood blobs */
+@keyframes blob-sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+@keyframes blob-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+@keyframes blob-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes blob-bounce {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  40% { transform: translateY(-7px) scale(0.97, 1.03); }
+  55% { transform: translateY(0) scale(1.04, 0.96); }
+}
+@keyframes blob-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+@keyframes blob-twinkle {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+.blob-wrap {
+  transition: transform 0.3s var(--ease-out), filter 0.3s;
+}
+.blob-selected {
+  transform: scale(1.18);
+  filter: drop-shadow(0 6px 14px rgba(var(--violet-rgb), 0.45));
+}
+.blob-body {
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+}
+.blob-sway { animation: blob-sway 3.6s ease-in-out infinite; }
+.blob-bob { animation: blob-bob 3.2s ease-in-out infinite; }
+.blob-float { animation: blob-float 3s ease-in-out infinite; }
+.blob-bounce { animation: blob-bounce 1.8s var(--ease-out) infinite; }
+.blob-blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blob-blink 4.2s ease-in-out infinite;
+}
+.blob-sparkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blob-twinkle 1.6s ease-in-out infinite;
+}
+.blob-zzz { animation: blob-twinkle 2.4s ease-in-out infinite; }
+
 /* Navigation */
 .topnav {
   transition:
@@ -578,8 +657,10 @@
 }
 .sidebar {
   background:
-    linear-gradient(180deg, rgba(var(--accent-rgb), 0.07), transparent 38%),
-    var(--color-surface);
+    linear-gradient(180deg, rgba(var(--accent-rgb), 0.06), transparent 38%),
+    rgba(var(--white-rgb), 0.55);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 .nav-item[aria-current="page"] {
   box-shadow: inset 3px 0 0 var(--color-brand-600);
@@ -642,6 +723,13 @@
     opacity: 1 !important;
     transform: none !important;
   }
+  .blob-sway,
+  .blob-bob,
+  .blob-float,
+  .blob-bounce,
+  .blob-blink,
+  .blob-sparkle,
+  .blob-zzz,
   .aurora-blob,
   .marquee-track,
   .float-a,

@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Annoyed, ArrowRight, Frown, Laugh, Meh, Smile } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
+import { MoodBlob, SCALE_BLOB, SLEEP_BLOB } from '../../components/MoodBlob'
 import { api, errorMessage } from '../../lib/api'
 import { useApp } from '../../lib/appState'
 import { useT, type TKey } from '../../lib/i18n'
@@ -9,12 +10,7 @@ import type { CheckIn, SleepQuality } from '../../types/api'
 import { ChoiceGroup, ErrorBanner, InfoNote, PageHeader, PageLoader, Spinner, SuccessBanner, SyntheticBadge } from '../../components/ui'
 
 const TIME_CHOICES = [30, 60, 90, 120, 180]
-const MOOD_ICONS = [Frown, Annoyed, Meh, Smile, Laugh]
-
-function moodIcon(v: number) {
-  const Icon = MOOD_ICONS[v - 1]
-  return <Icon className="h-5 w-5" aria-hidden />
-}
+const blobIcon = (v: number) => (active: boolean) => <MoodBlob mood={SCALE_BLOB[v]} selected={active} size={44} />
 
 export function CheckInPage() {
   const { t } = useT()
@@ -109,7 +105,7 @@ export function CheckInPage() {
       value: v,
       label: String(v),
       sub: t(`${prefix}.${v}` as TKey),
-      icon: prefix === 'mood' ? moodIcon(v) : undefined,
+      icon: prefix === 'workload' ? undefined : blobIcon(v),
     }))
 
   return (
@@ -126,7 +122,11 @@ export function CheckInPage() {
             hint={t('ci.sleepEn')}
             value={sleep}
             onChange={setSleep}
-            options={(['poor', 'okay', 'good'] as const).map((s) => ({ value: s, label: t(`sleep.${s}`) }))}
+            options={(['poor', 'okay', 'good'] as const).map((s) => ({
+              value: s,
+              label: t(`sleep.${s}`),
+              icon: (active: boolean) => <MoodBlob mood={SLEEP_BLOB[s]} selected={active} size={44} />,
+            }))}
           />
           <ChoiceGroup
             name="workload"

@@ -192,7 +192,7 @@ export function WelcomePage() {
   const [endRef, endSeen] = useInView<HTMLDivElement>(0.9)
 
   return (
-    <div className="min-h-dvh overflow-x-clip bg-canvas">
+    <div className="min-h-dvh overflow-x-clip">
       <div className="scroll-progress" style={{ transform: `scaleX(${progress})` }} aria-hidden />
 
       {/* Top nav */}
