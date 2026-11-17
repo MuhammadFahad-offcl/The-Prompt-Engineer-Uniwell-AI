@@ -1,283 +1,363 @@
+<div align="center">
+
 # UniWell AI
 
-**Your academic journey, your wellbeing, intelligently connected.**
+### Your academic journey, your wellbeing, intelligently connected.
 
-UniWell AI is a non-clinical student wellbeing and academic workload companion. A university student does a one-minute check-in and enters their real deadlines. UniWell then gives them a short, feasible plan generated live by AI, and that plan **adapts to their feedback** next time.
+A non-clinical student wellbeing and academic workload companion that turns real deadlines, daily check-ins, available time, and student feedback into a practical, adaptive study plan.
 
-> UniWell is a student wellbeing and planning companion, **not** a medical or mental-health diagnostic service. It never diagnoses, screens, scores or treats anyone. If you are in immediate danger, contact a trusted person, local emergency services or the nearest emergency department.
+[![TypeScript](https://img.shields.io/badge/TypeScript-51.9%25-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Python](https://img.shields.io/badge/Python-45%25-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![License](https://img.shields.io/badge/license-not_specified-lightgrey)](#project-status)
+[![Status](https://img.shields.io/badge/status-active_prototype-blue)](#project-status)
 
-Built for the AI Hackathon & Startup Pitch: **SDG 03, Good Health & Well-being**, niche *AI for Accessible Healthcare & Well-Being*. Product spec: [`docs/PRD.md`](docs/PRD.md). Data provenance: [`DATA_SOURCES.md`](DATA_SOURCES.md).
+[Product requirements](docs/PRD.md) · [Design system](DESIGN.md) · [Data sources](DATA_SOURCES.md)
+
+</div>
 
 ---
 
+> **Important:** UniWell is a student planning and wellbeing companion, not a medical or mental-health diagnostic service. It does not diagnose, screen, score, or treat anyone, and it is not an emergency service. If you are in immediate danger, contact someone you trust or your local emergency services.
+
+## At a glance
+
+UniWell helps university students—initially students in Pakistan—make an overwhelming academic day feel more manageable. It combines a short daily check-in with actual tasks and deadlines, calculates a transparent view of workload, and creates a feasible AI-assisted micro-plan. Student feedback informs deterministic adjustments to future plans.
+
+```text
+Daily check-in + real tasks + available time
+                    │
+                    ▼
+      Student Context & Workload Engines
+                    │
+                    ▼
+       Academic Pressure Radar
+                    │
+                    ▼
+   Validated live AI study micro-plan
+                    │
+                    ▼
+       Student action and feedback
+                    │
+                    ▼
+     Deterministic plan adaptation ──────► next plan
+```
+
+**Product principle:** The AI can personalize language and suggestions; the backend—not the model—owns feasibility, workload arithmetic, task eligibility, safety gates, and validation.
+
 ## The problem
 
-University students, starting with students in Pakistan, often juggle assignments, quizzes, exams and projects at the same time. To-do lists and one-off chatbot answers don't account for **today's** energy, **actual** available time, real deadlines, or whether yesterday's plan was manageable. So students keep getting plans they can't finish.
+Students often have assignments, quizzes, exams, and projects competing for the same limited hours. A conventional to-do list records tasks but does not account for how much time is actually available today, how soon work is due, or how the student is feeling. A one-off chatbot can suggest a schedule, but it usually lacks the student's real task state and does not reliably learn from what worked.
 
-**UniWell connects the pieces:**
+This leaves students to estimate workload, decide what can realistically fit, and repeatedly rebuild plans when their energy or circumstances change. Generic productivity tools can also treat an overloaded day as a prioritization problem without making the time trade-off clear.
 
-```
-Daily check-in → Student Context Engine → Academic Pressure Radar
-      → Live AI micro-plan → Student action → Feedback → Adapted next plan
-```
+## What UniWell solves
 
-General AI can generate a study plan. UniWell links a student's real workload, daily check-ins, available time and feedback into one planning loop that adapts over time.
+UniWell connects the student's planning inputs into one explainable feedback loop:
 
-## Features (all P0 items shipped)
+- **Makes workload visible:** compares estimated task minutes due soon with the student's available time and explains the calculation.
+- **Turns context into action:** uses a brief check-in, task deadlines, and preferences to propose a small, time-bounded plan.
+- **Keeps plans realistic:** deterministic backend checks prevent plans from exceeding the available time, using unknown tasks, or ignoring product constraints.
+- **Adapts with student consent:** feedback can shorten study blocks, reduce the number of tasks, add buffer, or preserve what is working. Adjustments are explained; proposed MindBalance changes require confirmation.
+- **Keeps agency with the student:** plans are suggestions. Student-set priorities and deadlines are not silently changed.
+- **Uses non-clinical language:** wellbeing information is descriptive and self-reported, not a diagnosis or mental-health score.
 
-| | Feature | What it does |
-|---|---|---|
-| 1 | **Anonymous onboarding** | No email, phone or CNIC. A random ID stays in the browser. Choose English or Roman Urdu and a preferred study block (15–45 min). Privacy and non-clinical notice with consent. |
-| 2 | **60-second check-in** | Three questions (mood 1–5, sleep poor/okay/good, perceived workload 1–5) in Roman Urdu with English hints, plus energy and available minutes. One check-in per day; edits update it rather than duplicate it. |
-| 3 | **Task manager** | Add, edit, complete and delete tasks. Filter by active, today, upcoming, overdue or completed; sort by deadline or priority. The student's own priority is never rewritten. |
-| 4 | **Academic Pressure Radar** | `ratio = minutes due within 48 h ÷ available minutes`. Below 0.75 is *manageable*, 0.75–1.00 *tight*, above 1.00 *over capacity*. Shows every number and the rule, with icons and text labels (never colour alone). Explicitly **not** a stress score. |
-| 5 | **Live adaptive AI plan** | Gemini (or Groq) generates study blocks, breaks, one wellbeing pause, a study tip, an affirmation, "why this plan", deferred tasks and a fallback. The **backend** enforces the time budget, valid task IDs, session length and non-clinical wording. |
-| 6 | **Feedback → adaptation** | "Did you follow it? How manageable? How helpful? Why?" Deterministic rules shorten sessions, cut task count, add buffer or keep what worked. Every change is logged and explained in the next plan. |
-| 7 | **Insights and history** | 7-day self-reported trends, with sample sizes and descriptive wording only. Plan history and an adaptation log. |
-| 8 | **Resource library** | WHO and NHS links (metadata plus our own summaries, with licence notes) and six original micro-activities. |
-| 9 | **Safety and privacy** | A note that says the student is in immediate danger pauses planning and shows a compassionate message, with no invented hotline numbers. One-click full data deletion. Coarse analytics only. |
-| 10 | **Synthetic demo mode** | Load an overloaded or a manageable synthetic student, labelled everywhere as "Demo data — synthetic example". |
+The product hypothesis is that a quick check-in plus structured workload, a feasible plan, and a feedback loop can help students prioritize. This is a hypothesis to validate—not a proven clinical or academic outcome.
 
-## Tech stack
+## Product capabilities
 
-| Layer | Choice |
+| Capability | What it does |
 |---|---|
-| Frontend | React 19, Vite, TypeScript, Tailwind CSS v4, Recharts, lucide icons |
-| Backend | Python 3.12+ (tested on 3.14), FastAPI, Pydantic v2, SQLAlchemy 2, SQLite |
-| AI | Gemini REST API (default) or Groq's OpenAI-compatible API, behind an `AIProvider` abstraction. Called with `httpx`, no SDK. |
-| Tests | Pytest (83 tests), TypeScript build, oxlint |
+| Anonymous onboarding | Creates a random browser-held user ID; no email, phone number, or CNIC is required. Students choose a language and preferred study-block duration and see the non-clinical notice. |
+| Daily check-in | Captures mood, sleep, perceived workload, energy, and available minutes. Check-ins are editable for the day. |
+| Task management | Create, edit, complete, delete, filter, and sort academic tasks by status, due date, and priority. The student's priority is not rewritten. |
+| Academic Pressure Radar | Estimates work due within 48 hours against available minutes. `< 0.75` is manageable, `0.75–1.00` is tight, and `> 1.00` is over capacity. This is an academic time estimate, not a wellbeing score. |
+| Adaptive AI micro-plans | Requests a live plan from Gemini or Groq, validates the response, and presents study blocks, breaks, a wellbeing pause, rationale, and deferred work where applicable. |
+| Feedback and adaptation | Uses reported manageability, helpfulness, completion, and reasons to apply deterministic planning adjustments for a later plan. |
+| Insights and history | Shows descriptive self-reported trends and plan history with sample sizes; it avoids diagnostic or causal claims. |
+| MindBalance | Offers deterministic check-ins, recovery activities, journaling, descriptive insights, and proposed plan adjustments. Journal entries and check-in notes are encrypted at rest using Fernet. |
+| Resource library | Provides resource metadata and original summaries, including WHO and NHS references, with licensing notes. Some resources are marked as not yet reviewed. |
+| Safety and deletion | A detected immediate-danger statement pauses planning and presents a supportive pathway. Users can delete their stored data. Keyword detection is limited and is not a risk assessment. |
+| Synthetic demo mode | Loads clearly labelled synthetic overloaded or manageable scenarios for demonstration; synthetic records are not presented as real outcomes. |
+| English and Roman Urdu | Provides language selection and localized product content; some untranslated interface strings may fall back to English. |
 
-## MindBalance Engine
+## Product and system architecture
 
-A wellbeing-first module in the main navigation (**MindBalance**), with six tabs: Home, Check-in, Recovery, Journal, Insights and Adaptive plan. It runs entirely on deterministic Python rules, so it needs **no LLM and has no API cost**.
+### End-to-end request flow
 
-```
-Check-in → state analysis → recovery suggestion → activity → "How are you feeling now?"
-        → (student-confirmed) schedule adjustments → live AI plan → pattern insights
-```
+1. **Browser app:** The React single-page application stores an anonymous ID in browser storage and sends it as `X-User-Id` for user-scoped API requests.
+2. **API boundary:** FastAPI validates requests with Pydantic schemas. Routes enforce record ownership and delegate work to service modules.
+3. **Deterministic context and workload:** Backend services assemble a minimal planning context, rank eligible tasks, calculate the available-time budget, and apply adaptation rules.
+4. **Safety gate and AI provider:** The plan service performs safety checks before calling the configured provider. Gemini is the default; Groq is optional behind the same provider abstraction. Credentials stay on the server.
+5. **Validation and persistence:** AI output is parsed and validated against the response contract and feasibility constraints. The backend may safely repair output and make one corrective retry; failures are returned honestly rather than replaced with a fabricated plan.
+6. **Student feedback:** Feedback is stored and converted into deterministic adaptation events that can inform the next plan. The student remains in control of proposed adjustments.
 
-- **Check-in:** mood (5 levels), stress 1–10, energy 1–10, mental condition, academic pressure, and an optional private note. Transparent rules map these to *Balanced*, *Elevated stress*, *Low energy*, *Overloaded* or *Recovery recommended*. The rules are shown in the UI. This is never a diagnosis.
-- **Recovery activities:**
-  - guided breathing (2 or 5 min, animated 4-2-6 cycle)
-  - interactive 5-4-3-2-1 grounding (nothing is saved)
-  - thought-unloading journal
-  - energy recovery (walk, stretch, water, screen break, rest, mindful minute)
-  - motivation reset (task micro-steps)
+### Architecture diagram
 
-  Each activity takes optional before and after stress/energy ratings plus "was this helpful?". Students can stop at any time. Activities the student rated helpful twice are suggested first; this is a fixed rule, not machine learning.
-- **Insights:** 14-day stress and energy trends, a stress-vs-energy chart, check-in consistency, recovery usage and helpfulness, and the average change after recovery. Observations appear only above sample-size thresholds, are worded as patterns rather than causes, and show an empty state when there isn't enough data.
-- **Adaptive plan:** based on the check-in and real tasks, MindBalance proposes:
-  - a recovery activity first
-  - shorter blocks
-  - fewer tasks
-  - splitting the most urgent task (same total minutes, same deadline)
-  - deferring non-urgent tasks from *today's* plan
-
-  **Nothing is applied until the student ticks and confirms it.** Deadlines never move and tasks are never deleted. Confirmed choices change the next live AI plan, which receives the state and ratings only, never journal text.
-- **Privacy:** journal entries and check-in notes are **encrypted at rest** with Fernet. The key comes from `MINDBALANCE_KEY`, or else a generated, git-ignored `backend/.journal.key`. They are returned only to their owner and never sent to an AI provider. All MindBalance routes use the same per-user ownership guard and are included in "Delete my data".
-- **Safety:** explicit statements of immediate danger in a note or journal entry show a safety pathway instead of recommendations, and state that UniWell is not an emergency service. Support contacts appear only from `backend/app/data/support_contacts.json` entries that have a `verified_source` and a `verified_on` date. The file is empty by default, so no numbers are invented.
-
-**Endpoints:**
-- `GET /api/mindbalance/{user_id}/summary`
-- `POST /api/mindbalance/checkins`, `GET /api/mindbalance/checkins/{user_id}`
-- `POST /api/mindbalance/sessions`, `POST /api/mindbalance/sessions/{id}/finish`, `GET /api/mindbalance/sessions/{user_id}`
-- `POST /api/mindbalance/journal`, `GET /api/mindbalance/journal/{user_id}`, `DELETE /api/mindbalance/journal/{id}`
-- `GET /api/mindbalance/insights/{user_id}`
-- `GET /api/mindbalance/micro-steps/{task_id}`
-- `POST /api/mindbalance/adjustments/propose`, `POST /api/mindbalance/adjustments/{id}/decide`
-
-**New tables:** `wellbeing_checkins`, `recovery_sessions`, `journal_entries` and `plan_adjustments`. They are created automatically by `create_all` on startup; existing tables are unchanged.
-
-## Design system
-
-The UI follows **[`DESIGN.md`](DESIGN.md)**, the "Dusk Aurora" design system written with the `web-design` skill from the PRD:
-
-- **Theme:** indigo identity with aurora light (violet and mint), Plus Jakarta Sans for headings and Inter for body text, 20px cards and soft tinted shadows. Every color is a token in `frontend/src/index.css`; components contain no hex values, and charts read the tokens at runtime.
-- **Landing page (L2 showpiece):** an aurora hero with a cursor spotlight, a word-by-word headline with a flowing gradient phrase, and a tilted "Example" preview stack; a marquee of the core loop; a bento feature grid with spotlight cards and an animated adaptation counter.
-- **App screens (L2-lite):** data is always visible immediately. Screens get mount entrances, an animated Pressure Radar gauge and count-ups, check-pops on plan items and a glow on new adaptations.
-- **Implementation and fallbacks:** no animation libraries — CSS, IntersectionObserver and rAF only (`src/lib/motion.ts`). Every effect has a `prefers-reduced-motion` fallback, and cursor effects run only on hover-capable devices.
-
-
-```
-React SPA (hash router, i18n dictionary, typed API client)
-   │  /api/*  (Vite dev proxy → FastAPI; X-User-Id = anonymous ID)
-   ▼
-FastAPI routes ── ownership guard on every record
-   ├─ workload_engine.py     deterministic radar + task ranking
-   ├─ adaptation_engine.py   plan constraints + feedback rules
-   ├─ context_builder.py     minimal JSON context (no IDs/nickname), untrusted text kept as data
-   ├─ plan_service.py        safety gate → AI call → JSON + Pydantic → feasibility checks
-   │                         → safe repair → 1 corrective retry → persist (or honest error)
-   ├─ ai_service.py          GeminiProvider / GroqProvider (keys server-side only)
-   ├─ safety_service.py      sanitization, danger routing, clinical-claim filter
-   └─ resource_service.py, demo_service.py, data_service.py, events_service.py
-   ▼
-SQLite: users, checkins, tasks, plans, plan_items, feedback, adaptation_events, resources, events
+```text
+┌───────────────────────────────────────────────────────────┐
+│ Browser                                                   │
+│ React 19 · TypeScript · Vite · Tailwind CSS · Recharts    │
+│ Anonymous session · hash router · i18n · typed API client│
+└─────────────────────────────┬─────────────────────────────┘
+                              │ /api/*, X-User-Id
+                              ▼
+┌───────────────────────────────────────────────────────────┐
+│ FastAPI application                                       │
+│ Routes · Pydantic contracts · ownership checks            │
+│                                                           │
+│ Workload engine ─ Context builder ─ Adaptation engine      │
+│      │                 │                 │                │
+│      └──────────── Plan service ─────────┘                │
+│                         │                                 │
+│            Safety → provider → validate → persist         │
+│                         │                                 │
+│        GeminiProvider / GroqProvider (optional)           │
+└─────────────────────────┬─────────────────────────────────┘
+                          │ SQLAlchemy
+                          ▼
+┌───────────────────────────────────────────────────────────┐
+│ SQLite                                                    │
+│ Profiles · check-ins · tasks · plans · feedback           │
+│ adaptations · resources · events · MindBalance records     │
+└───────────────────────────────────────────────────────────┘
 ```
 
-**Who decides what.** The backend owns deadlines, ownership, workload totals, priority order, the time budget, valid task IDs, adaptation rules and safety. The AI owns wording, concrete first steps, the choice of wellbeing activity, language and tone. If the model breaks a rule, the server trims or clamps safely, or asks for one correction. If it still fails, the student sees an error. **The app never substitutes a template plan or labels one as AI.**
+### Backend decision boundaries
 
+| Deterministic backend responsibilities | AI responsibilities |
+|---|---|
+| User/record ownership; deadlines; workload and time-budget calculations; task ranking and valid task IDs; maximum plan constraints; safety routing; output validation; adaptation rules. | Natural-language personalization; study instructions; supportive wording; selected activity suggestions; concise explanations and language style. |
+
+Student-entered task text and optional notes are untrusted input. The system prompt is fixed server-side, and user text is passed as delimited data rather than instructions. Optional planning notes are length-limited, used for that request, and are not stored. The context builder minimizes information sent to the model; it does not include user IDs or nicknames.
+
+### Main code areas
+
+```text
+backend/
+├── app/
+│   ├── api/routes/       # Health, profile, check-ins, tasks, radar, plans, feedback, insights, resources, demo
+│   ├── services/         # Workload, context, planning, AI, safety, adaptation, data and events
+│   ├── schemas/          # Pydantic API and AI response contracts
+│   ├── db/               # SQLAlchemy models and database session
+│   └── data/             # Resource catalogue
+└── tests/                # Backend tests; provider is mocked in tests
+frontend/
+└── src/
+    ├── features/         # Onboarding, check-in, tasks, radar, plans, insights, MindBalance, settings
+    ├── components/       # Shared layout, UI primitives and error boundary
+    └── lib/              # API client, i18n, routing, session and formatting
+scripts/                  # Demo-data utilities
+ docs/                    # Product requirements
 ```
-backend/app/
-  api/routes/   health, profile, checkins, tasks, radar, plans, feedback, insights, resources, demo
-  services/     (see above)
-  schemas/      Pydantic request/response + AI output contract
-  db/           SQLAlchemy models + session
-  data/resources.json
-backend/tests/  83 pytest tests (mock AI provider in tests only)
-frontend/src/
-  features/     onboarding, checkin, tasks, pressure-radar, plans, feedback, insights, resources, settings, dashboard
-  components/   Layout, UI primitives, ErrorBoundary
-  lib/          api.ts, i18n.ts, router.ts, session.ts, format.ts
-scripts/seed_demo.py
-```
 
-## Setup
+## Technology stack
 
-**Prerequisites:** Python 3.12+ and Node 20.19+ (built and tested with Python 3.14 and Node 26).
+| Area | Technology |
+|---|---|
+| Web application | React 19, TypeScript, Vite, Tailwind CSS v4 |
+| Visualization and icons | Recharts, lucide-react |
+| API | Python 3.12+, FastAPI, Pydantic v2 |
+| Persistence | SQLAlchemy 2, SQLite |
+| AI providers | Gemini REST API (default) or Groq OpenAI-compatible API, through an `AIProvider` abstraction and `httpx` |
+| Testing and quality | Pytest, TypeScript build, oxlint |
 
-### 1. Environment
+## Get started
+
+### Prerequisites
+
+- Python 3.12 or newer
+- Node.js 20.19 or newer
+- npm
+- An API key from [Google AI Studio](https://aistudio.google.com/apikey) for live Gemini plans, or a [Groq API key](https://console.groq.com/keys) if using Groq
+
+The rest of the application can be explored without an AI key; live plan generation requires a configured provider.
+
+### 1. Clone and configure
 
 ```bash
-cp .env.example .env        # Windows: copy .env.example .env
+git clone https://github.com/MuhammadFahad-offcl/The-Prompt-Engineer-Uniwell-AI.git
+cd The-Prompt-Engineer-Uniwell-AI
+cp .env.example .env
 ```
 
-Then edit `.env` at the repo root:
+On Windows Command Prompt, use `copy .env.example .env` instead of `cp`.
 
-| Variable | Required | Notes |
-|---|---|---|
-| `AI_PROVIDER` | no | `gemini` (default) or `groq` |
-| `GEMINI_API_KEY` | **yes, for live plans** | Free key from https://aistudio.google.com/apikey |
-| `GEMINI_MODEL` | no | Defaults to `gemini-2.5-flash`. Set any model your key can use. |
-| `GROQ_API_KEY` / `GROQ_MODEL` | only if `AI_PROVIDER=groq` | Key from https://console.groq.com/keys. Default model is `openai/gpt-oss-120b`. |
-| `DATABASE_URL` | no | Defaults to `backend/uniwell.db` |
-| `FRONTEND_ORIGIN` | no | CORS allowlist, default `http://localhost:5173` |
-| `APP_ENV` | no | `development` enables `/api/demo/seed`; `production` disables it |
+Set the provider key in the root `.env` file. For Gemini:
 
-Without an API key, everything except plan generation works, and the plan screen says **"AI provider not configured"**. It never shows a fake plan. `.env` is git-ignored; never commit it.
+```dotenv
+AI_PROVIDER=gemini
+GEMINI_API_KEY=your-gemini-api-key
+```
 
-### 2. Backend (terminal 1)
+Or configure Groq:
+
+```dotenv
+AI_PROVIDER=groq
+GROQ_API_KEY=your-groq-api-key
+```
+
+Never commit `.env` or expose provider credentials in frontend code.
+
+### 2. Start the backend
 
 ```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\activate            # macOS/Linux: source .venv/bin/activate
+```
+
+Activate the virtual environment:
+
+```bash
+# macOS / Linux
+source .venv/bin/activate
+
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+
+# Windows Command Prompt
+.venv\Scripts\activate.bat
+```
+
+Install dependencies and run the API:
+
+```bash
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-Check it: http://127.0.0.1:8000/api/health should show `"ai": {"configured": true, ...}` once your key is set. Interactive API docs are at http://127.0.0.1:8000/docs.
+- Health check: <http://127.0.0.1:8000/api/health>
+- Interactive API docs: <http://127.0.0.1:8000/docs>
 
-### 3. Frontend (terminal 2)
+### 3. Start the frontend
+
+In a second terminal, from the repository root:
 
 ```bash
 cd frontend
 npm install
-npm run dev                        # http://localhost:5173 (proxies /api to :8000)
+npm run dev
 ```
 
-### 4. Tests and checks
+Open <http://localhost:5173>. The Vite development server proxies `/api` requests to the backend.
+
+### 4. Run checks
+
+Backend tests (from `backend/`, with its virtual environment active):
 
 ```bash
-cd backend && .venv\Scripts\python -m pytest -q      # 83 tests
-cd frontend && npm run build && npm run lint
+python -m pytest -q
 ```
 
-Automated tests use a **mock AI provider only** (`backend/tests/helpers.py`). The app itself has no mock path; the demo must call the real provider.
+Frontend type-check/build and lint (from `frontend/`):
 
-### Synthetic demo data
+```bash
+npm run build
+npm run lint
+```
 
-- **In the app:** on the onboarding screen or under *Settings → Demo data*, choose **Load demo: overloaded day** or **manageable day**. This replaces data for *your* anonymous ID only.
-- **CLI:** `backend/.venv/Scripts/python scripts/seed_demo.py --user-id <ID from Settings> --scenario overloaded`.
+Backend tests use a mock AI provider; the running application does not silently substitute a fake plan. Without a configured provider key, plan generation reports that the provider is not configured.
 
-Seeding is repeatable. The seeded "yesterday" plan is labelled *"Synthetic demo record — written by the seed script, not AI output"*, and its feedback is processed by the real adaptation engine.
+## Configuration
 
-## Two-minute demo
+Copy `.env.example` to `.env` in the repository root and adjust as needed:
 
-1. **Settings → Load demo: overloaded day.** This gives 3 tasks due soon (DBMS 90 min today, DSA 30 min later today, AI quiz 60 min tomorrow), 120 minutes available, mood 3, sleep okay, workload 5 and energy 2.
-2. **Dashboard → Pressure Radar.** It shows **180 min of work vs 120 min available, ratio 1.50, over capacity**, with the rule spelled out.
-3. **Plan → Generate my adaptive plan.** This is a live provider call; the badge reads *Generated live by gemini · model*. Point out:
-   - "Adapted from your feedback": yesterday's synthetic feedback already shortened blocks from 30 to 25 minutes and focused the plan on 1 task.
-   - The time budget, the deferred tasks, the wellbeing pause, "why this plan" and the fallback.
-4. Tick one item done. Give feedback: **Partially · manageable 2 · helpful 3 · "Sessions too long"**. The summary shows *25 → 20 min blocks, buffer 10 → 15*.
-5. **Generate my next plan.** The new plan uses **20-minute blocks** and explains why.
-6. **Insights.** Self-reported 7-day trends with sample sizes, described as "you reported…", never as a diagnosis.
-7. Optional: **Settings → Delete my data** (type DELETE). Everything is removed and the app returns to the welcome screen.
+| Variable | Required | Description |
+|---|---:|---|
+| `AI_PROVIDER` | No | `gemini` (default) or `groq`. |
+| `GEMINI_API_KEY` | For live Gemini plans | Gemini API credential. Keep it server-side. |
+| `GEMINI_MODEL` | No | Model override; defaults to `gemini-2.5-flash`. |
+| `GROQ_API_KEY` | For live Groq plans | Groq API credential when `AI_PROVIDER=groq`. |
+| `GROQ_MODEL` | No | Model override; defaults to `openai/gpt-oss-120b`. |
+| `DATABASE_URL` | No | SQLite URL; default is `sqlite:///./uniwell.db` when running Uvicorn from `backend/`. |
+| `FRONTEND_ORIGIN` | No | CORS allowlist origin; defaults to `http://localhost:5173`. |
+| `APP_ENV` | No | `development` enables the demo seed endpoint; use `production` to disable it. |
+| `MINDBALANCE_KEY` | No | Fernet key for MindBalance journal encryption. If unset, a local ignored key file is generated. Preserve the key to decrypt existing journal entries. |
 
-## API reference
+## API overview
 
-All user routes require the header `X-User-Id: <anonymous id>`. Every record is checked against it; another user's record returns 403/404.
+User-scoped routes require `X-User-Id: <anonymous-id>`. The backend checks that records belong to that ID. The API returns errors using a consistent `{"error": {"code", "message"}}` shape.
 
 | Method | Route | Purpose |
 |---|---|---|
-| GET | `/api/health` | Status, DB, AI provider configured/model |
-| POST | `/api/profile` | Create/update anonymous profile (consent required) |
-| GET | `/api/profile/{user_id}` | Profile incl. effective (adapted) session length |
-| POST | `/api/profile/{user_id}/reset-adaptation` | Undo automatic adjustments |
-| DELETE | `/api/user/{user_id}/data` | Delete all of this user's records |
-| POST | `/api/checkins` | Save today's check-in (upsert per local day) |
-| GET | `/api/checkins/{user_id}` | History + today's check-in |
-| POST / GET / PATCH / DELETE | `/api/tasks`, `/api/tasks/{user_id}`, `/api/tasks/{task_id}` | Task CRUD |
-| GET | `/api/radar/{user_id}` | Academic Pressure Radar + ranked tasks |
-| POST | `/api/plans/generate` | Live AI plan (or safety pause) |
-| GET | `/api/plans/{user_id}` | Plan history + adaptation log |
-| GET | `/api/plans/detail/{plan_id}` | One plan with items and feedback |
-| PATCH | `/api/plan-items/{item_id}` | Mark item complete/incomplete |
-| POST | `/api/feedback` | Feedback → adaptation events |
-| GET | `/api/insights/{user_id}` | 7-day descriptive insights |
-| GET | `/api/resources` | Resource catalogue (public) |
-| POST | `/api/demo/seed` | Synthetic demo data (development only) |
+| `GET` | `/api/health` | Health and provider configuration status |
+| `POST` | `/api/profile` | Create or update an anonymous profile |
+| `GET` | `/api/profile/{user_id}` | Retrieve profile and effective session preference |
+| `POST` | `/api/profile/{user_id}/reset-adaptation` | Reset automatic planning adjustments |
+| `DELETE` | `/api/user/{user_id}/data` | Delete the user's stored data |
+| `POST` | `/api/checkins` | Save or update today's check-in |
+| `GET` | `/api/checkins/{user_id}` | Retrieve check-in history |
+| `POST`, `GET`, `PATCH`, `DELETE` | `/api/tasks` and `/api/tasks/{task_id}` | Create and manage tasks |
+| `GET` | `/api/radar/{user_id}` | Workload estimate and ranked tasks |
+| `POST` | `/api/plans/generate` | Generate a live plan or return a safety pause |
+| `GET` | `/api/plans/{user_id}` | Plan history and adaptation log |
+| `GET` | `/api/plans/detail/{plan_id}` | Retrieve a plan with items and feedback |
+| `PATCH` | `/api/plan-items/{item_id}` | Mark a plan item complete or incomplete |
+| `POST` | `/api/feedback` | Submit plan feedback and produce adaptation events |
+| `GET` | `/api/insights/{user_id}` | Descriptive, self-reported insights |
+| `GET` | `/api/resources` | Read the resource catalogue |
+| `POST` | `/api/demo/seed` | Seed synthetic demo data (development only) |
 
-Every error has the shape `{"error": {"code", "message"}}`. AI codes are `ai_not_configured` (503), `ai_timeout` (504), `ai_rate_limited` (429), `ai_auth_failed`, `ai_model_not_found`, `ai_invalid_output` (502) and `checkin_required` (409).
+MindBalance routes cover wellbeing summaries, check-ins, recovery sessions, journal entries, insights, micro-steps, and proposed/decided plan adjustments. See the route modules in `backend/app/api/routes/` and the interactive API docs for request and response schemas.
 
-## AI design
+## Privacy, safety, and responsible use
 
-- **Context engine:** sends only today's check-in, constraints, up to 8 ranked candidate tasks, 7 days of check-in summaries, the last 3 feedback entries and recent adaptation notes. It sends **no** user ID, nickname or timezone name.
-- **Prompt-injection resistance:** the system prompt is fixed on the server. Task titles, subjects and the optional note are sanitized and placed in a delimited JSON *data* block that the model is told never to obey. The output is validated against a strict schema.
-- **Hard checks:**
-  - only known task IDs, and no completed tasks
-  - total ≤ budget ≤ available minutes
-  - each study block ≤ the session limit
-  - task count within the limit
-  - exactly one wellbeing item
-  - no diagnostic or clinical wording, and nothing about skipping sleep or meals or all-nighters
-- **Optional note:** "Anything we should know about today?" is length-limited, sent only with that request and **never stored**.
+- **Non-clinical by design:** no diagnosis, screening, treatment, or mental-health score. Insights are descriptive, self-reported, and shown with sample sizes where applicable.
+- **Data minimization:** onboarding is anonymous; AI context excludes IDs and nicknames; optional planning notes are not persisted; product events are coarse and do not contain check-in values or free text.
+- **Secrets:** provider API keys remain on the backend. Do not commit local environment files or encryption keys.
+- **Ownership checks:** user-scoped records are checked against the anonymous ID supplied by the browser.
+- **AI guardrails:** the backend fixes the system prompt, treats user text as untrusted data, checks safety before generation, validates model output and enforces plan constraints.
+- **Sensitive notes:** MindBalance journal entries and check-in notes are encrypted at rest with Fernet. The encryption key must be securely retained; losing or changing it can make existing entries unreadable.
+- **Deletion:** the application provides a user-data deletion endpoint and a UI path to clear browser data.
+- **Immediate-danger messaging:** detection pauses plan generation and directs the student toward trusted people or local emergency services. This keyword-based gate can miss or misclassify language; it is not a risk assessment.
+- **Synthetic data:** demo profiles and plans are artificial and labelled as such; they are not user outcomes.
 
-## Safety and privacy
+## Demo walkthrough
 
-- Non-clinical copy throughout. No mental-health score exists anywhere in the product.
-- Explicit statements of immediate danger, in the note or in a task title, stop plan generation and show a supportive message pointing to a trusted person, local emergency services or the nearest emergency department. **No hotline numbers are shown, because none has been verified for this build.**
-- Data minimization: anonymous ID, no free text stored, coarse analytics events only (event names, never mood values or text).
-- API keys stay on the server and never reach the browser. CORS is restricted to an allowlist. Request bodies are capped at 64 KB. Plan generation is rate-limited per user. Logs never include prompts.
-- Full deletion: `DELETE /api/user/{id}/data` and clearing browser storage, covered by a test that checks every table.
+1. Open onboarding or **Settings → Demo data** and load the overloaded-day scenario.
+2. Review the Pressure Radar and its explicit comparison of workload minutes with available time.
+3. Generate a plan with a configured live provider and inspect its rationale, time budget, wellbeing pause, and deferred tasks.
+4. Mark an item complete and submit feedback about manageability and helpfulness.
+5. Generate another plan to see deterministic adaptation reflected in the next result.
+6. Review descriptive insights and, if desired, exercise the data-deletion flow.
 
-## Known limitations
+Demo seeding is enabled only in development (`APP_ENV=development`). The CLI helper is available at `scripts/seed_demo.py`.
 
-- **MindBalance encryption key.** If `MINDBALANCE_KEY` changes or `backend/.journal.key` is lost, old journal entries can't be decrypted; they show as "could not decrypt" rather than garbage. On serverless hosting (e.g. Vercel), set `MINDBALANCE_KEY` explicitly. Note that SQLite there does not persist between requests.
-- **Not production auth.** The anonymous ID header is a hackathon ownership guard, not authentication. A real deployment needs authentication, encryption at rest, a retention policy, a security review and a legal/privacy review.
-- **SQLite and no migrations.** If the schema changes between versions, delete `backend/uniwell.db`; it contains only local and demo data.
-- **Roman Urdu UI is partial.** AI output fully follows the chosen language. Untranslated UI strings fall back to English.
-- **Danger detection is simple keyword matching.** It is a conservative routing gate, not a risk assessment, and it can miss phrasing or flag benign text.
-- **Resources:** licensing is metadata only, and `reviewed: false` until a human checks it.
-- **Rate limiting:** the in-memory limiter resets when the server restarts.
-- **Live AI was not exercised during the build.** No provider key was available in the build environment, so the honest "not configured" state was verified against the running server. Plan rendering was checked with a throwaway local mock server. Run one real generation with your key before the demo.
+## Project status and limitations
 
-## Startup and impact hypothesis
+This repository is an active prototype built for an AI hackathon and startup pitch, aligned with **UN Sustainable Development Goal 3: Good Health & Well-being**. The project includes a working application, API, tests, and synthetic demo flow. It is **not yet a production-ready service for real student data**.
 
-**B2B2C.** Universities and student-affairs teams sponsor access for students. Later options include an institution-specific directory of verified support resources and premium planning features. Individual check-ins stay private. Any institutional analytics would be opt-in, aggregated, subject to minimum cohort sizes and governed separately.
+Before a real deployment, the following gaps need to be addressed and reviewed:
 
-**Pilot hypotheses (future, not proven):**
+- The anonymous `X-User-Id` is a prototype ownership guard, not authentication. A deployment needs a reviewed identity and authorization model.
+- SQLite is used for local persistence; production operations would require an appropriate database strategy, migrations, backup and recovery procedures.
+- Define and implement production data-retention, consent, incident-response, access-control, and security-review processes.
+- The in-memory rate limiter resets on server restart and is not a distributed production limiter.
+- Safety detection is simple keyword matching and is not comprehensive.
+- Resource records may be marked `reviewed: false`; verify current content, licensing, and local support information before launch.
+- Roman Urdu coverage is partial, and full Urdu RTL support is not included.
+- Live provider behavior depends on external provider availability, credentials, quotas, and model output.
 
-- ≥70% of onboarded students complete a check-in
-- ≥60% of check-ins lead to a plan
-- ≥50% of plans get feedback
-- average helpfulness ≥4/5
+Pilot metrics in the product requirements are **future hypotheses**, not measured results. Task completion is not a proxy for clinical wellbeing, and UniWell makes no claim to improve mental health.
 
-Task completion is not a proxy for clinical wellbeing, and UniWell makes no claim to improve mental health. Other student-wellbeing products exist; UniWell's angle is the locally relevant, feedback-driven connection between workload, daily context and adaptive planning.
+## Contributing
 
-## Hackathon compliance
+Contributions and feedback are welcome. For changes:
 
-- Built from scratch in this repository after kickoff, with one commit per milestone.
-- No secrets committed (`.env` is ignored; `.env.example` is provided).
-- Synthetic data only, clearly labelled.
-- Live AI, with no faked responses.
+1. Keep feasibility, privacy, student agency, and non-clinical language as product requirements.
+2. Add or update tests for backend behavior and API contracts.
+3. Run backend tests and frontend build/lint checks before opening a pull request.
+4. Never include API keys, real student data, or identifying information in commits, fixtures, logs, or screenshots.
+
+For larger product decisions, consult [`docs/PRD.md`](docs/PRD.md) and [`DESIGN.md`](DESIGN.md).
+
+## Project documents
+
+- [Product requirements](docs/PRD.md)
+- [Design system](DESIGN.md)
+- [Data sources and provenance](DATA_SOURCES.md)
+
+## License
+
+No license is currently specified in this repository. Unless and until one is added, all rights remain with the copyright holder; do not assume the project is available for reuse under an open-source license.
