@@ -4,7 +4,8 @@ import { api, errorMessage } from '../../lib/api'
 import { useApp } from '../../lib/appState'
 import { useT } from '../../lib/i18n'
 import { navigate } from '../../lib/router'
-import type { CheckIn } from '../../types/api'
+import type { CheckIn, Radar } from '../../types/api'
+import { RadarCard } from '../pressure-radar/RadarCard'
 import { ErrorBanner, PageLoader, Stat, SyntheticBadge } from '../../components/ui'
 
 // Milestone-3 dashboard: greeting + check-in status. Radar, tasks and plan cards are added next.
@@ -12,6 +13,7 @@ export function DashboardPage() {
   const { t } = useT()
   const { userId, profile, dataVersion } = useApp()
   const [checkin, setCheckin] = useState<CheckIn | null>(null)
+  const [radar, setRadar] = useState<Radar | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -20,7 +22,9 @@ export function DashboardPage() {
     setLoading(true)
     setError(null)
     try {
-      setCheckin((await api.listCheckIns(userId, 7)).today)
+      const [ci, rd] = await Promise.all([api.listCheckIns(userId, 7), api.radar(userId)])
+      setCheckin(ci.today)
+      setRadar(rd)
     } catch (err) {
       setError(errorMessage(err))
     } finally {
@@ -72,6 +76,7 @@ export function DashboardPage() {
           </button>
         </section>
       )}
+      {!loading && !error && radar && <RadarCard radar={radar} compact />}
     </div>
   )
 }
