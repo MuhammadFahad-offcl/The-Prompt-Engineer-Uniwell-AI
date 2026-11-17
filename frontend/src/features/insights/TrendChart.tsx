@@ -60,7 +60,7 @@ export function TrendChart({
               labelFormatter={(_l, p) => (p?.[0]?.payload?.date as string) ?? ''}
               contentStyle={{ borderRadius: 12, borderColor: GRID, fontSize: 12 }}
             />
-            <Line type="monotone" dataKey="value" stroke={color} strokeWidth={2} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} activeDot={{ r: 5 }} connectNulls={false} isAnimationActive={false} />
+            <Line type="linear" dataKey="value" stroke={color} strokeWidth={2} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} activeDot={{ r: 5 }} connectNulls={false} isAnimationActive={false} />
           </LineChart>
         </ResponsiveContainer>
       </div>

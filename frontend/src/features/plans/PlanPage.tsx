@@ -11,7 +11,7 @@ import { FeedbackPanel } from '../feedback/FeedbackPanel'
 
 export function PlanPage({ planId }: { planId: string | null }) {
   const { t } = useT()
-  const { userId, health, dataVersion, refreshProfile } = useApp()
+  const { userId, health, dataVersion, refreshProfile, refreshHealth } = useApp()
   const [plan, setPlan] = useState<PlanDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -74,6 +74,7 @@ export function PlanPage({ planId }: { planId: string | null }) {
       setGenError(err instanceof ApiError ? err : new ApiError(0, 'unknown', errorMessage(err)))
     } finally {
       setGenerating(false)
+      void refreshHealth() // keep the AI-provider status note current (e.g. after a key is added)
     }
   }
 

@@ -71,7 +71,7 @@ export function Layout({ current, children }: { current: string; children: React
           <button type="button" onClick={() => navigate('dashboard')} aria-label="UniWell home">
             <Logo />
           </button>
-          {profile?.is_synthetic && <SyntheticBadge />}
+          {profile?.is_synthetic && <span className="chip shrink-0 border border-warn-700/25 bg-warn-50 text-warn-700">Synthetic demo</span>}
         </header>
 
         <main id="main" className="mx-auto w-full max-w-5xl px-4 pb-28 pt-5 sm:px-6 lg:pb-12 lg:pt-8">
